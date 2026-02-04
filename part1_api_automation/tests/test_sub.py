@@ -13,7 +13,7 @@ logger = get_logger(__file__)
 @pytest.mark.smoke
 def test_get_course_list():
     # 
-    client = ApiClient(url_type="classroom")
+    client = ApiClient(token = AuthManager.get_token(), url_type="classroom")
     
     try:
         # API 호출
