@@ -5,12 +5,17 @@ from utils.logger import logger
 class ApiClient:
     # BASE URL 관리
     def __init__(self, token=None, url_type="account"): #기본값 account
+        if token is None:
+            token = config.get("token")
+            
         key = f"{url_type}_base_url"
         self.base_url=config[key]
+        
         self.session = requests.Session()
         self.session.headers.update({
             "Content-Type":"application/json",
         })
+        
         if token:
             self.session.headers.update({"Authorization":f"Bearer {token}"})
 
