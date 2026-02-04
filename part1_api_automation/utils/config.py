@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 config = {
-    "base_url": "https://api-account.elice.io",
+    "account_base_url": "https://api-account.elice.io",
+    "dash_base_url" : "https://api-dashboard.elice.io",
+    "classroom_base_url" :"https://api-classroom.elice.io",
+    "rest_base_url":"https://api-rest.elice.io",
     "token": os.getenv("TOKEN"),
 }
 
