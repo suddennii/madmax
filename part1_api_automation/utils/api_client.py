@@ -39,8 +39,5 @@ class ApiClient:
         return self._handle_response(response) # Positive 시나리오 처리
     
     def _handle_response(self, response):
-        # 응답 처리 메서드
-        logger.info(f"[RESPONSE] {response.status_code} {response.text}") # 상태 코드랑 본문 로그 남기기
-        if response.status_code >= 400: # 400이상이면 오류임
-            raise Exception(f"API Error: {response.status_code} - {response.text}") 
-        return response.json()
+        return response
+
