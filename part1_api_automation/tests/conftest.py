@@ -8,5 +8,7 @@ def token():
     return AuthManager.get_token()
 
 @pytest.fixture
-def client(token):
-    return ApiClient(token=token)
+def client(request, token):
+    base_url = getattr(request, "param", None)
+    client = ApiClient(token=token, base_url=base_url)
+    return client
