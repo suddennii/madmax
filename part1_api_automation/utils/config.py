@@ -14,7 +14,8 @@ config = {
 #-----
 # API 기본 설정
 #-----
-BASE_URL = "https://qatrack.elice.io"
+QATRACK_URL = "https://qatrack.elice.io"
+CLASSROOM_URL = "https://api-classroom.elice.io"
 CLASSROOM_ID = "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
 
 # -----
