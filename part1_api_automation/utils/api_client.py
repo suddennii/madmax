@@ -4,9 +4,11 @@ from utils.logger import logger
 
 class ApiClient:
     # BASE URL 관리
-    def __init__(self, token=None):
+    def __init__(self, token=None, base_url=None):
+        # base_url이 전달되면 그걸 쓰고, 없으면 config["base_url"] 사용
+        self.base_url = base_url or config["base_url"]
         # 토큰을 안 넘기면 기본값이 None
-        self.base_url=config["base_url"]
+        # self.base_url=config["base_url"]
         # config 라는 객체에 base_url 값을 가져와서 변수에 저장
         # 호출할 API 서버의 기본 주소
         self.session = requests.Session()
