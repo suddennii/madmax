@@ -4,7 +4,7 @@ from utils.api_client import ApiClient
 # 인증이 필요한 API 엔드포인트 (네 서비스에 맞게 수정)
 TEST_ENDPOINT = "/account/me"   # 예: /users/me, /profile 등
 
-def main():
+def test_main():
     token = AuthManager.get_token()
     client = ApiClient(token=token)
 
@@ -16,6 +16,3 @@ def main():
     print("\n=== 결과 ===")
     print("Status Code:", response.status_code)
     print("Response Body:", response.text)
-
-if __name__ == "__main__":
-    main()
