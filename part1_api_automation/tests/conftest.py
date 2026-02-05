@@ -13,10 +13,5 @@ def token():
 def client(token):
     return ApiClient(token=token)
 
-@pytest.fixture
-def student_course_parmas():
-    path=os.path.join(
-        "test_data", "student_course.json"
-    )
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+
+
