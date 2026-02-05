@@ -15,7 +15,6 @@ config = {
     "extoken" : os.getenv("EXTOKEN")
 }
 
-
 def basic_json():
     path = os.path.join("test_data","basic.json")
     with open(path, "r", encoding="utf-8") as f:
@@ -31,9 +30,6 @@ def build_student_course_endpoint(params):
 
 # API 기본 설정
 #-----
-QATRACK_URL = "https://qatrack.elice.io"
-CLASSROOM_URL = "https://api-classroom.elice.io"
-
 CLASSROOM_ID = "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
 
 # -----

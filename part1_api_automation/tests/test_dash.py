@@ -6,8 +6,6 @@ from utils.logger import logger
 from utils.config import basic_json
 from utils.config import build_student_course_endpoint
 
-
-
 # DASH-T01, DASH-T02, DASH-T03, DASH-T05
 @pytest.mark.parametrize("params", basic_json()["params"])
 def test_course_list(client, params):
