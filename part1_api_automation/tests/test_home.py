@@ -59,7 +59,7 @@ def test_post_emotion():
         if "unique_constraint_violation" in str(e):
             pytest.xfail("이미 오늘 감정 표현을 완료함.")
         raise e
-
+ 
     
 
     
