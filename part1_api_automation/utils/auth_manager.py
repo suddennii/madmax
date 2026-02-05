@@ -5,3 +5,6 @@ class AuthManager:
     @staticmethod
     def get_token():
         return config["token"]
+    @staticmethod
+    def get_extoken():
+        return config["extoken"]
