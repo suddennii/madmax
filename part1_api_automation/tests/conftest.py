@@ -26,3 +26,5 @@ def student_course_parmas():
 @pytest.fixture
 def board_api(client):
     return BoardAPI(client)
+
+

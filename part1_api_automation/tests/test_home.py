@@ -23,20 +23,36 @@ def test_get_classhome_status():
 #--------------------------------------------------------------------   
 def test_get_classhome_notoken():
     client = ApiClient(token=None, url_type="classroom") 
-    res = client.session.get(
-        client.base_url + f"/classroom/{CLASSROOM_ID}"
-        )
+    with pytest.raises(Exception) as e:
+        client.get(f"/classroom/{CLASSROOM_ID}")
 
-    assert res.status_code == 403
-    assert res.json()["code"] == "no_access_token"
+    assert "403" in str(e.value)
+    assert "no_access_token"  in str(e.value)
 #--------------------------------------------------------------------
 # HOME_03[공통] 클래스홈 페이지 접속(토큰 만료)    
 #--------------------------------------------------------------------   
-# def test_get_classhome_extoken():
-#     token = AuthManager.get_extoken()
+def test_get_classhome_extoken():
+    token = AuthManager.get_extoken()
+    client = ApiClient(token=token, url_type="classroom")
+    
+    with pytest.raises(Exception) as e:
+        client.get(f"/classroom/{CLASSROOM_ID}")
+    
+    assert "403" in str(e.value)
+    assert "authorization failed" in str(e.value)
+#--------------------------------------------------------------------
+# HOME_04[공통] org 헤더 누락  -> 이거 원래 누락 되면 응답 안왔는데 왜 오늘은 오는거죠
+#--------------------------------------------------------------------   
+
+#--------------------------------------------------------------------
+# HOME_05[이모지] 오늘의 기분 POST   
+#--------------------------------------------------------------------   
+# def test_post_emotion():
+#     token = AuthManager.get_token()
 #     client = ApiClient(token=token, url_type="classroom")
-#     res = client.get(
-#         f"/classroom/{CLASSROOM_ID}"
-#     )
+#     data = {"classroom_id": str(CLASSROOM_ID), "emoji": "good"}
     
-    
+#     try:
+#         client.post("/emotion", data=data)
+#     except Exception as e:
+        
