@@ -2,6 +2,7 @@
 import pytest
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
+from utils.board_api import BoardAPI
 import os
 import json
 
@@ -13,5 +14,17 @@ def token():
 def client(token):
     return ApiClient(token=token)
 
+@pytest.fixture
+def student_course_parmas():
+    path=os.path.join(
+        "test_data", "student_course.json"
+    )
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+    
+
+@pytest.fixture
+def board_api(client):
+    return BoardAPI(client)
 
 
