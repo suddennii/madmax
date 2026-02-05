@@ -48,7 +48,7 @@ def test_get_lsub02():
         assert isinstance(response, list)
         
         if not isinstance(response, list):
-            raise TypeError(f"Expectid list, but got {type(response).__name__}")
+            raise TypeError(f"Expected list, but got {type(response).__name__}")
         
         assert len(response) > 0, "응답 리스트가 비어 있습니다"
         logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
@@ -78,7 +78,7 @@ def test_get_lsub03():
         assert isinstance(response, dict)
         
         if not isinstance(response, dict):
-            raise TypeError(f"Expectid list, but got {type(response).__name__}")
+            raise TypeError(f"Expected list, but got {type(response).__name__}")
         
         assert len(response) > 0, "응답 리스트가 비어 있습니다"
         logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
@@ -123,11 +123,11 @@ def test_get_lsub04():
         raise
     
 # offset/count 페이징 동작 확인
-# @pytest.mark.smoke
-# @pytest.mark.parametrize("skip, count", [
-#     (0, 5), # 첫 번째 페이지, 5개 요청
-#     (5, 5)  # 두 번째 페이지, 그 다음 5개 요청
-# ])
+@pytest.mark.smoke
+@pytest.mark.parametrize("skip, count", [
+    (0, 5), # 첫 번째 페이지, 5개 요청
+    (5, 5)  # 두 번째 페이지, 그 다음 5개 요청
+])
 def test_get_lsub5(skip, count):
     client = ApiClient(token = AuthManager.get_token(), url_type="course")
     # 헤더에 (x-elice-org-name-short 추가)
@@ -149,7 +149,7 @@ def test_get_lsub5(skip, count):
         assert isinstance(response, list)
         
         if not isinstance(response, list):
-            raise TypeError(f"Expectid list, but got {type(response).__name__}")
+            raise TypeError(f"Expected list, but got {type(response).__name__}")
         
         # 2 응답 개수가 요청한 count보다 작거나 같아야 함
         actual_count = len(response)
