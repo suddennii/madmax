@@ -10,8 +10,10 @@ config = {
     "dash_base_url" : "https://api-dashboard.elice.io",
     "classroom_base_url" :"https://api-classroom.elice.io",
     "rest_base_url":"https://api-rest.elice.io",
+    "course_base_url":"https://api-course.elice.io",
     "token": os.getenv("TOKEN"),
 }
+
 
 def basic_json():
     path = os.path.join("test_data","basic.json")
@@ -32,6 +34,7 @@ def build_student_course_endpoint(params):
 #-----
 QATRACK_URL = "https://qatrack.elice.io"
 CLASSROOM_URL = "https://api-classroom.elice.io"
+
 CLASSROOM_ID = "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
 
 # -----
@@ -44,3 +47,13 @@ RETRY = 3     # 실패 시 재시도 횟수
 PAGE_SKIP = 0
 PAGE_COUNT = 20
 TARGET_COURSE = "SANDBOX"
+ORG_NAME = "qatrack"
+ELICE_COURSE_ID = 766557
+LECTURE_ID = 6644275
+DEFAULT_PARAMS = {
+    "filter_lecture_id": LECTURE_ID,
+    "filter_locator_type": 0,
+    "skip": 0,
+    "count": 40,
+    "elice_course_id": ELICE_COURSE_ID
+}
