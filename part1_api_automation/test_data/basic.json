@@ -1,0 +1,35 @@
+[
+  {
+    "account_id": "8861406",
+    "classroom_id": "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc",
+    "offset": 0,
+    "count": 5
+  },
+  {
+    "account_id": "8861406",
+    "classroom_id": "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc",
+    "offset": 0,
+    "count": 10,
+    "expected": {
+        "items":10
+    }
+  },
+  {
+    "account_id": "8861406",
+    "classroom_id": "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc",
+    "offset": 9999,
+    "count": 5,
+    "expected": {
+        "items":0
+    }
+  },
+  {
+    "account_id": "000000",
+    "classroom_id": "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc",
+    "offset": 0,
+    "count": 5,
+    "expected": {
+        "items":0
+    }
+  }
+]

@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+import json
+from utils.endpoints import student_course
 
 load_dotenv()
 
@@ -11,6 +13,20 @@ config = {
     "token": os.getenv("TOKEN"),
 }
 
+def basic_json():
+    path = os.path.join("test_data","basic.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def build_student_course_endpoint(params):
+    return student_course(
+        account_id=params["account_id"],
+        classroom_id=params["classroom_id"],
+        offset=params["offset"],
+        count=params["count"]
+    )
+
+    
 #-----
 # API 기본 설정
 #-----
