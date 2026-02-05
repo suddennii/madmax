@@ -81,15 +81,15 @@ def test_get_lsub03():
             raise TypeError(f"Expected list, but got {type(response).__name__}")
         
         assert len(response) > 0, "응답 리스트가 비어 있습니다"
-        logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
+        logger.info(f"LSUB-03 성공: 데이터 개수={len(response)}")
     except AssertionError as e:
-        logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
         raise
     except TypeError as e:
-        logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
         raise
     except Exception as e:
-        logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
         raise
     
 
@@ -163,13 +163,13 @@ def test_get_lsub5(skip, count):
             logger.warning(f"LSUB-05 경고 [skip={skip}]: 해당 페이지에 데이터가 없습니다.")
             
     except AssertionError as e:
-        logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-05 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
         raise
     except TypeError as e:
-        logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-05 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
         raise
     except Exception as e:
-        logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-05 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
         raise
     
 # 잘못된 파라메터 입력시 오류처리
@@ -212,7 +212,7 @@ def test_get_lsub6(invalid_param, expected_status, description):
     ("token", "인증 토큰(Authorization)이 없는 경우"),
     ("org_name", "필수 헤더(x-elice-org-name-short)가 없는 경우")
 ])
-def test_get_lsub_missing_auth_headers(missing_type, description):
+def test_get_lsub7(missing_type, description):
    
     # 1 클라이언트 생성 (토큰 누락 케이스인 경우 None 전달)
     token = None if missing_type == "token" else AuthManager.get_token()
