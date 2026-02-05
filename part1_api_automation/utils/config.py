@@ -22,14 +22,12 @@ def basic_json():
 
 def build_student_course_endpoint(params):
     return student_course(
-        account_id=params["account_id"],
-        classroom_id=params["classroom_id"],
-        offset=params["offset"],
-        count=params["count"]
+        account_id=params.get("account_id"),
+        classroom_id=params.get("classroom_id"),
+        offset=params.get("offset"),
+        count=params.get("count")
     )
 
-    
-#-----
 # API 기본 설정
 #-----
 QATRACK_URL = "https://qatrack.elice.io"
