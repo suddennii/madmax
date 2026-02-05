@@ -16,7 +16,7 @@ def test_course_list(client, params):
     logger.info(f"RAW RESPONSE: {response}")
     logger.info(f"TYPE: {type(response)}")
 
-    # 공통 검증
+    # 공통 검증 ㄹ
     for item in response:
         assert "course" in item
         assert "learning_progress" in item
