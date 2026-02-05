@@ -1,5 +1,5 @@
 import pytest
-from utils.config import QATRACK_URL, TIMEOUT, CLASSROOM_ID, CLASSROOM_URL, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE
+from utils.config import TIMEOUT, CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
 from utils.logger import get_logger
@@ -8,13 +8,19 @@ from utils.logger import get_logger
 logger = get_logger(__file__)
 # === logger 설정 끝 ===
 
+
 # 학습과목 목록 조회 테스트
 @pytest.mark.smoke
-@pytest.mark.parametrize("client", [CLASSROOM_URL], indirect=True)
-def test_get_course_list(client):
+def test_get_course_list():
+    # 
+    client = ApiClient(token = AuthManager.get_token(), url_type="classroom")
+    
     try:
         # API 호출
-        response = client.get(f"/classroom/{CLASSROOM_ID}/course", params={"skip":PAGE_SKIP, "count":PAGE_COUNT})
+        response = client.get(
+            f"/classroom/{CLASSROOM_ID}/course",
+            params={"skip":PAGE_SKIP, "count":PAGE_COUNT}
+        )
         
         # 기본 검증
         assert client.status_code == 200
