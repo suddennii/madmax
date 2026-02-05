@@ -12,6 +12,7 @@ config = {
     "rest_base_url":"https://api-rest.elice.io",
     "course_base_url":"https://api-course.elice.io",
     "token": os.getenv("TOKEN"),
+    "extoken" : os.getenv("EXTOKEN")
 }
 
 def basic_json():
