@@ -47,12 +47,19 @@ def test_get_classhome_extoken():
 #--------------------------------------------------------------------
 # HOME_05[이모지] 오늘의 기분 POST   
 #--------------------------------------------------------------------   
-# def test_post_emotion():
-#     token = AuthManager.get_token()
-#     client = ApiClient(token=token, url_type="classroom")
-#     data = {"classroom_id": str(CLASSROOM_ID), "emoji": "good"}
+@pytest.mark.xfail(reson="하루 1회 제한으로 인한 중복 에러 허용")
+def test_post_emotion():
+    token = AuthManager.get_token()
+    client = ApiClient(token=token, url_type="classroom")
+    data = {"classroom_id": str(CLASSROOM_ID), "emoji": "good"}
+    try:
+        res = client.post("/emotion", data=data)
+        assert res.status_code ==200
+    except Exception as e:
+        if "unique_constraint_violation" in str(e):
+            pytest.xfail("이미 오늘 감정 표현을 완료함.")
+        raise e
+
     
-#     try:
-#         client.post("/emotion", data=data)
-#     except Exception as e:
-        
+
+    
