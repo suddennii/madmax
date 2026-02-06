@@ -5,21 +5,45 @@ from utils.endpoints import student_course
 
 load_dotenv()
 
+# === API 기본 설정 ===
 config = {
-    "account_base_url": "https://api-account.elice.io",
-    "dash_base_url" : "https://api-dashboard.elice.io",
-    "classroom_base_url" :"https://api-classroom.elice.io",
-    "rest_base_url":"https://api-rest.elice.io",
-    "course_base_url":"https://api-course.elice.io",
+    "account_base_url": os.getenv("ACCOUNT_BASE_URL"),
+    "dash_base_url": os.getenv("DASH_BASE_URL"),
+    "classroom_base_url": os.getenv("CLASSROOM_BASE_URL"),
+    "rest_base_url": os.getenv("REST_BASE_URL"),
+    "course_base_url": os.getenv("COURSE_BASE_URL"),
     "token": os.getenv("TOKEN"),
-    "extoken" : os.getenv("EXTOKEN")
+    "extoken": os.getenv("EXTOKEN"),
 }
 
+# === 기타 설정 ===
+CLASSROOM_ID = os.getenv("CLASSROOM_ID")
+TIMEOUT = int(os.getenv("TIMEOUT", 10))
+RETRY = int(os.getenv("RETRY", 3))
+
+# === 상수 정의 ===
+PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
+PAGE_COUNT = int(os.getenv("PAGE_COUNT", 20))
+TARGET_COURSE = os.getenv("TARGET_COURSE", "SANDBOX")
+ORG_NAME = os.getenv("ORG_NAME", "qatrack")
+ELICE_COURSE_ID = int(os.getenv("ELICE_COURSE_ID", 766557))
+LECTURE_ID = int(os.getenv("LECTURE_ID", 6644275))
+
+DEFAULT_PARAMS = {
+    "filter_lecture_id": LECTURE_ID,
+    "filter_locator_type": int(os.getenv("DEFAULT_FILTER_LOCATOR_TYPE", 0)),
+    "skip": int(os.getenv("DEFAULT_SKIP", 0)),
+    "count": int(os.getenv("DEFAULT_COUNT", 40)),
+    "elice_course_id": ELICE_COURSE_ID
+}
+
+# === JSON 파일 로드 함수 ===
 def basic_json():
-    path = os.path.join("test_data","basic.json")
+    path = os.path.join("test_data", "basic.json")
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+# === 학생-강좌 엔드포인트 빌드 ===
 def build_student_course_endpoint(params):
     return student_course(
         account_id=params.get("account_id"),
@@ -27,28 +51,3 @@ def build_student_course_endpoint(params):
         offset=params.get("offset"),
         count=params.get("count")
     )
-
-# API 기본 설정
-#-----
-CLASSROOM_ID = "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
-
-# -----
-# 기타 설정
-# -----
-TIMEOUT = 10  # API 요청 타임아웃 (초)
-RETRY = 3     # 실패 시 재시도 횟수
-
-# === 상수 정의 ===
-PAGE_SKIP = 0
-PAGE_COUNT = 20
-TARGET_COURSE = "SANDBOX"
-ORG_NAME = "qatrack"
-ELICE_COURSE_ID = 766557
-LECTURE_ID = 6644275
-DEFAULT_PARAMS = {
-    "filter_lecture_id": LECTURE_ID,
-    "filter_locator_type": 0,
-    "skip": 0,
-    "count": 40,
-    "elice_course_id": ELICE_COURSE_ID
-}
