@@ -22,7 +22,7 @@ def load_yaml(path:str):
     with file_path.open(encoding='utf-8') as f:
         return yaml.safe_load(f)
 
-# === 기타 설정 ===
+# === 기타 설정 === 
 CLASSROOM_ID = os.getenv("CLASSROOM_ID")
 ACCOUNT_ID = int(os.getenv("ACCOUNT_ID"))
 TIMEOUT = int(os.getenv("TIMEOUT", 10))

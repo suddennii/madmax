@@ -31,9 +31,9 @@ class ApiClient:
             return self._handle_response(response)
         return self._handle_response(response)
     
-    def patch(self, path, data=None,params=None,raise_error=True):
+    def patch(self, path, data=None,raise_error=True):
         url = self.base_url + path
-        logger.info(f"[PATCH] {url} | params={params} | body={data}")
+        logger.info(f"[PATCH] {url}  body={data}")
         response = self.session.patch(url, json=data)
         if raise_error:
             return self._handle_response(response)
