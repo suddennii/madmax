@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
-import json
 from utils.endpoints import student_course
+import yaml
+from pathlib import Path
 
 load_dotenv()
 
@@ -15,10 +16,15 @@ config = {
     "extoken" : os.getenv("EXTOKEN")
 }
 
-def basic_json():
-    path = os.path.join("test_data","basic.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+# def basic_json():
+#     path = os.path.join("test_data","basic.json")
+#     with open(path, "r", encoding="utf-8") as f:
+#         return json.load(f)
+
+def load_yaml(path:str):
+    file_path=Path(path)
+    with file_path.open(encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
 def build_student_course_endpoint(params):
     return student_course(

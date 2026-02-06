@@ -5,9 +5,13 @@ from utils.auth_manager import AuthManager
 from utils.logger import logger
 from utils.config import basic_json
 from utils.config import build_student_course_endpoint
+from utils.config import load_yaml
+
+
+data = load_yaml("test_data/basic.yml")
 
 # DASH-T01, DASH-T02, DASH-T03, DASH-T05
-@pytest.mark.parametrize("params", basic_json()["params"])
+@pytest.mark.parametrize("params", data)
 def test_course_list(client, params):
     token = AuthManager.get_token() # 토큰 가져오고
     client = ApiClient(token=token, url_type="dash") # 이렇게 base url 불러올 수 있게
