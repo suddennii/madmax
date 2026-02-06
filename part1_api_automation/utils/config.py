@@ -1,3 +1,9 @@
+"""
+2026-02-06 심다영
+게시글 작성/수정(REST API)과 목록 조회(Classroom API)를 위한 엔드포인트 분리
+"""
+
+
 import os
 from dotenv import load_dotenv
 from utils.endpoints import student_course
