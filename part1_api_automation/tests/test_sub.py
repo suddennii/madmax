@@ -235,7 +235,7 @@ def test_get_lsub7(missing_type, description):
         
         assert "401" in error_msg or "403" in error_msg
         
-        logger.info(f"성공: [{description}] 기대한 에러 발생 확인 ({error_msg})")
+        logger.info(f"성공: [{description}] 기대한 에러 발생 확인.. ({error_msg})")
 
     except AssertionError as e:
         logger.error(f"실패: [{description}] 에러가 발생하지 않았거나 상태 코드가 다릅니다. {e}")
