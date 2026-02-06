@@ -48,6 +48,8 @@ def build_student_course_endpoint(params):
     return student_course(
         account_id=params.get("account_id"),
         classroom_id=params.get("classroom_id"),
+        filter_title=params.get("filter_title"),
         offset=params.get("offset"),
+        skip=params.get("skip"),
         count=params.get("count")
     )
