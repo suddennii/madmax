@@ -43,12 +43,43 @@ wrong_params:
       type : "greater_than_equal"
 
   - account_id: "8861406"
-    classroom_id: "1234"
+    classroom_id: "1234aaa"
     offset: 0
-    count: -1
+    count: 5
     expected: 
       code: 422
       type : "uuid_parsing"
+  
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    count: 5
+    expected: 
+      code: 422
+      type : "missing"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: -1
+    count: 5
+    expected: 
+      code: 422
+      type : "greater_than_equal"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    expected: 
+      code: 422
+      type : "missing"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: 0
+    expected: 
+      code: 422
+      type : "greater_than_equal"
+
 
 classroom_params_positive :
   - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
@@ -83,3 +114,17 @@ classroom_params_negative :
     expected:
       code: 422
       type : "greater_than_equal"
+
+account :
+  - account_id: 8861406
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861406
+
+account_negative:
+  - account_id: 8861863
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861863
+      code: 403
+      type : "no_access_token"

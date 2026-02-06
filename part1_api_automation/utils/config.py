@@ -1,6 +1,13 @@
+"""
+2026-02-06 심다영
+게시글 작성/수정(REST API)과 목록 조회(Classroom API)를 위한 엔드포인트 분리
+"""
+
+
 import os
 from dotenv import load_dotenv
 from utils.endpoints import student_course
+from utils.endpoints import student_account
 import yaml
 from pathlib import Path
 
@@ -25,6 +32,7 @@ def load_yaml(path:str):
 # === 기타 설정 === 
 CLASSROOM_ID = os.getenv("CLASSROOM_ID")
 ACCOUNT_ID = int(os.getenv("ACCOUNT_ID"))
+ACCOUNT_ID2 = int(os.getenv("ACCOUNT_ID2"))
 TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 REST_BASE_URL = config["rest_base_url"]
@@ -56,4 +64,9 @@ def build_student_course_endpoint(params):
         offset=params.get("offset"),
         skip=params.get("skip"),
         count=params.get("count")
+    )
+def build_student_account_endpoint(params):
+    return student_account(
+        account_id=params.get("account_id"),
+        classroom_id=params.get("classroom_id")
     )

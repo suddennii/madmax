@@ -125,6 +125,43 @@ def test_get_emotion_noclassid():
 #--------------------------------------------------------------------
 # HOME_09[이어서 학습] get요청
 #-------------------------------------------------------------------- 
-# def test_get_study():
-#     token = AuthManager.get_token()
-#     client = ApiClient(token=token)
+def test_get_study():
+    token = AuthManager.get_token()
+    client = ApiClient(token=token,url_type="dash")
+    res =client.get(f"/classroom/{CLASSROOM_ID}/next_lecture_page")
+
+    expected_fields = {
+        "course_id"  : int,
+        "lecture_id" : int,
+        "lecture_page_id" : int,
+        "course_title" : str,
+        "lecture_page_title" : str
+    }
+
+    for field,data_type in expected_fields.items():
+        assert field in res,f"응답에 {field}가 없습니다."
+        assert isinstance(res[field],data_type),f"{field}필드는 {data_type.__name__}타입이여야 합니다."
+        
+#--------------------------------------------------------------------
+# HOME_10[학습진행률] get요청
+#-------------------------------------------------------------------- 
+def test_get_progress():
+    token = AuthManager.get_token()
+    client = ApiClient(token=token,url_type="dash")
+    params = {"classroom_id":CLASSROOM_ID}
+    res = client.get(f"/student/{ACCOUNT_ID}", params=params)
+    
+    expected_fields = {
+        "learning_progress"  : str,
+        "test_score" : str,
+        "practice_score" : str,
+        "submit_cnt" : int,
+        "test_completed_cnt" : int
+    }
+    for field,data_type in expected_fields.items():
+        assert field in res,f"응답에 {field}가 없습니다."
+        assert isinstance(res[field],data_type),f"{field}필드는 {data_type}타입이여야 합니다."
+    
+#--------------------------------------------------------------------
+# HOME_10[학습진행률] get요청(다른사람account_id2)
+#-------------------------------------------------------------------- 
