@@ -27,6 +27,8 @@ CLASSROOM_ID = os.getenv("CLASSROOM_ID")
 ACCOUNT_ID = int(os.getenv("ACCOUNT_ID"))
 TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
+REST_BASE_URL = config["rest_base_url"]
+CLASSROOM_BASE_URL = config["classroom_base_url"]
 
 # === 상수 정의 ===
 PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
