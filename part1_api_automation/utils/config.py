@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
-import json
 from utils.endpoints import student_course
+import yaml
+from pathlib import Path
 
 load_dotenv()
 
@@ -15,6 +16,11 @@ config = {
     "token": os.getenv("TOKEN"),
     "extoken": os.getenv("EXTOKEN"),
 }
+
+def load_yaml(path:str):
+    file_path=Path(path)
+    with file_path.open(encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
 # === 기타 설정 ===
 CLASSROOM_ID = os.getenv("CLASSROOM_ID")
@@ -38,12 +44,6 @@ DEFAULT_PARAMS = {
     "count": int(os.getenv("DEFAULT_COUNT", 40)),
     "elice_course_id": ELICE_COURSE_ID
 }
-
-# === JSON 파일 로드 함수 ===
-def basic_json():
-    path = os.path.join("test_data", "basic.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 # === 학생-강좌 엔드포인트 빌드 ===
 def build_student_course_endpoint(params):
