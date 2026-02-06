@@ -31,6 +31,14 @@ class ApiClient:
             return self._handle_response(response)
         return self._handle_response(response)
     
+    def patch(self, path, data=None,params=None,raise_error=True):
+        url = self.base_url + path
+        logger.info(f"[PATCH] {url} | params={params} | body={data}")
+        response = self.session.patch(url, json=data)
+        if raise_error:
+            return self._handle_response(response)
+        return self._handle_response(response)
+    
     def _handle_response(self, response):
         self.status_code = response.status_code
         if response.status_code >= 400:
