@@ -32,6 +32,7 @@ def load_yaml(path:str):
 # === 기타 설정 === 
 CLASSROOM_ID = os.getenv("CLASSROOM_ID")
 ACCOUNT_ID = int(os.getenv("ACCOUNT_ID"))
+ACCOUNT_ID2 = int(os.getenv("ACCOUNT_ID2"))
 TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 REST_BASE_URL = config["rest_base_url"]
