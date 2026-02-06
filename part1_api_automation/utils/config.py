@@ -22,8 +22,9 @@ def load_yaml(path:str):
     with file_path.open(encoding='utf-8') as f:
         return yaml.safe_load(f)
 
-# === 기타 설정 ===
+# === 기타 설정 === 
 CLASSROOM_ID = os.getenv("CLASSROOM_ID")
+ACCOUNT_ID = int(os.getenv("ACCOUNT_ID"))
 TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 
@@ -34,6 +35,7 @@ TARGET_COURSE = os.getenv("TARGET_COURSE", "SANDBOX")
 ORG_NAME = os.getenv("ORG_NAME", "qatrack")
 ELICE_COURSE_ID = int(os.getenv("ELICE_COURSE_ID", 766557))
 LECTURE_ID = int(os.getenv("LECTURE_ID", 6644275))
+
 
 DEFAULT_PARAMS = {
     "filter_lecture_id": LECTURE_ID,
