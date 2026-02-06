@@ -1,3 +1,17 @@
+
+'''
+파일 목적 :
+학습과목의 API 자동화 로직 구현
+
+작성자 : 조대건 / 수정일 : 26.02.04
+
+테스트 목적 :
+-로그인 API의 정상/에러 응답을 검증한다.
+-파라미터 조합별 응답 코드가 기대값과 일치하는지 확인한다.
+
+기타 주의 사항 :
+'''
+
 import pytest
 from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS
 from utils.auth_manager import AuthManager
