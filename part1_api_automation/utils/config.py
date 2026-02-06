@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from utils.endpoints import student_course
+from utils.endpoints import student_account
 import yaml
 from pathlib import Path
 
@@ -56,4 +57,9 @@ def build_student_course_endpoint(params):
         offset=params.get("offset"),
         skip=params.get("skip"),
         count=params.get("count")
+    )
+def build_student_account_endpoint(params):
+    return student_account(
+        account_id=params.get("account_id"),
+        classroom_id=params.get("classroom_id")
     )
