@@ -1,3 +1,8 @@
+"""
+2025-02-05 심다영
+board_api에 사용할 fixture 입력
+"""
+
 
 import pytest
 from utils.auth_manager import AuthManager
@@ -22,7 +27,6 @@ def student_course_parmas():
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
     
-
 @pytest.fixture
 def board_api(client):
     return BoardAPI(client)
