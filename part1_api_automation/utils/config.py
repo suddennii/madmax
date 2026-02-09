@@ -30,6 +30,7 @@ TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 REST_BASE_URL = config["rest_base_url"]
 CLASSROOM_BASE_URL = config["classroom_base_url"]
+CLASSROOM_ID2 = os.getenv("CLASSROOM_ID2")
 
 # === 상수 정의 ===
 PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
