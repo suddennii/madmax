@@ -1,3 +1,5 @@
+# test_dash의 테스트 데이터 파일
+
 params:
   - account_id: "8861406"
     classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
@@ -43,7 +45,7 @@ wrong_params:
       type : "greater_than_equal"
 
   - account_id: "8861406"
-    classroom_id: "1234aaa"
+    classroom_id: "1234"
     offset: 0
     count: 5
     expected: 
