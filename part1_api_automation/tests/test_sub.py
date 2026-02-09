@@ -13,7 +13,8 @@
 '''
 
 import pytest
-from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS, MATERIAL_QUIZ_ID
+import requests
+from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
 from utils.logger import get_logger
@@ -308,18 +309,18 @@ def test_get_load_test02():
     # 전역 설정 복사
     params = DEFAULT_PARAMS.copy()
     # # 페이징 테스트에 필요한 값으로 변경
-    params.update({
+    params={
         "material_quiz_id": 54716206
-    })
+    }
     
     try:
         # API 호출
-        response = client.get(f"/org/qatrack/material_quiz/get", params=params)
+        response = client.get(f"/org/qatrack/material_quiz/get/", params=params)
         
         assert client.status_code == 200
-        assert isinstance(response, list)
+        assert isinstance(response, dict)
         
-        if not isinstance(response, list):
+        if not isinstance(response, dict):
             raise TypeError(f"Expected list, but got {type(response).__name__}")
         
         # assert len(response) > 0, "응답 리스트가 비어 있습니다"
@@ -333,3 +334,4 @@ def test_get_load_test02():
     except Exception as e:
         logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
         raise
+    
