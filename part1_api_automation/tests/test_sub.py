@@ -14,7 +14,7 @@
 
 import pytest
 import requests
-from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS
+from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS, SCENARIO_LOAD_TEST
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
 from utils.logger import get_logger
@@ -259,79 +259,83 @@ logger = get_logger(__file__)
 #         logger.error(f"실패: [{description}] 예상치 못한 시스템 에러: {e}")
 #         raise
     
-# # 부하테스트 1 시험입장
-# @pytest.mark.smoke
-# def test_get_load_test01():
-#     client = ApiClient(token = AuthManager.get_token(), url_type="course")
+# 부하테스트 1 시험입장
+@pytest.mark.smoke
+def test_get_load_test01():
+    client = ApiClient(token = AuthManager.get_token(), url_type="course")
     
-#     # 헤더에 (x-elice-org-name-short 추가)
-#     client.session.headers.update({"x-elice-org-name-short": ORG_NAME})
+    # 헤더에 (x-elice-org-name-short 추가)
+    client.session.headers.update({"x-elice-org-name-short": ORG_NAME})
     
-#      # 전역 설정 복사
-#     params = DEFAULT_PARAMS.copy()
-#     # 페이징 테스트에 필요한 값으로 변경
-#     params.update({
-#         "count": 1,
-#         "filter_is_opened": True,
-#         "elice_course_id": 768575
-#     })
+     # 전역 설정 복사
+    params = DEFAULT_PARAMS.copy()
+    # 페이징 테스트에 필요한 값으로 변경
+    params.update({
+        "count": 1,
+        "filter_is_opened": True,
+        "elice_course_id": 768575
+    })
     
-#     try:
-#         # API 호출
-#         response = client.get(f"/lecture", params=params)
+    try:
+        # API 호출
+        response = client.get(f"/lecture", params=params)
         
-#         assert client.status_code == 200
-#         assert isinstance(response, list)
+        assert client.status_code == 200
+        assert isinstance(response, list)
         
-#         if not isinstance(response, list):
-#             raise TypeError(f"Expected list, but got {type(response).__name__}")
+        if not isinstance(response, list):
+            raise TypeError(f"Expected list, but got {type(response).__name__}")
         
-#         # assert len(response) > 0, "응답 리스트가 비어 있습니다"
-#         logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
-#     except AssertionError as e:
-#         logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
-#         raise
-#     except TypeError as e:
-#         logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
-#         raise
-#     except Exception as e:
-#         logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
-#         raise
+        # assert len(response) > 0, "응답 리스트가 비어 있습니다"
+        logger.info(f"TEST_GET_LOAD_TEST01 성공: 데이터 개수={len(response)}")
+    except AssertionError as e:
+        logger.error(f"TEST_GET_LOAD_TEST01 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+        raise
+    except TypeError as e:
+        logger.error(f"TEST_GET_LOAD_TEST01 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+        raise
+    except Exception as e:
+        logger.error(f"TEST_GET_LOAD_TEST01 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+        raise
 
-# 부하테스트 2 응시
+# 부하테스트 2 응시, 종료, 재응시
 @pytest.mark.smoke
 def test_get_load_test02():
     client = ApiClient(token = AuthManager.get_token(), url_type="rest")
     
-    # 헤더에 (x-elice-org-name-short 추가)
-    # client.session.headers.update({"x-elice-org-name-short": ORG_NAME})
-    
-    # 전역 설정 복사
-    params = DEFAULT_PARAMS.copy()
-    # # 페이징 테스트에 필요한 값으로 변경
-    params={
-        "material_quiz_id": 54716206
-    }
-    
-    try:
-        # API 호출
-        response = client.get(f"/org/qatrack/material_quiz/get/", params=params)
-        
-        assert client.status_code == 200
-        assert isinstance(response, dict)
-        
-        if not isinstance(response, dict):
-            raise TypeError(f"Expected list, but got {type(response).__name__}")
-        
-        # assert len(response) > 0, "응답 리스트가 비어 있습니다"
-        logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
-    except AssertionError as e:
-        logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
-        raise
-    except TypeError as e:
-        logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
-        raise
-    except Exception as e:
-        logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
-        raise
+    # 응시, 종료, 재응시 API호출
+    for step in SCENARIO_LOAD_TEST:
+        try:
+            # API 호출
+            method = step.get("method", "GET").lower()
+            if method == "get":
+                response = client.get(
+                        step["url"],
+                        params=step.get("params", {})
+                    )
+            elif method == "post":
+                response = client.post(
+                    step["url"],
+                    step.get("params", {})
+                )
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+            
+            assert client.status_code == 200
+            assert isinstance(response, dict)
+            
+            if not isinstance(response, dict):
+                raise TypeError(f"Expected list, but got {type(response).__name__}")
+            
+            # assert len(response) > 0, "응답 리스트가 비어 있습니다"
+            logger.info(f"TEST_GET_LOAD_TEST02 성공: 데이터 개수={len(response)}")
+        except AssertionError as e:
+            logger.error(f"TEST_GET_LOAD_TEST02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+            raise
+        except TypeError as e:
+            logger.error(f"TEST_GET_LOAD_TEST02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+            raise
+        except Exception as e:
+            logger.error(f"TEST_GET_LOAD_TEST02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+            raise
     
