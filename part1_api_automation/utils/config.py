@@ -56,6 +56,7 @@ TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 REST_BASE_URL = config["rest_base_url"]
 CLASSROOM_BASE_URL = config["classroom_base_url"]
+CLASSROOM_ID2 = os.getenv("CLASSROOM_ID2")
 
 # ============================================================
 # 4) 상수 정의
@@ -63,9 +64,11 @@ CLASSROOM_BASE_URL = config["classroom_base_url"]
 PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
 PAGE_COUNT = int(os.getenv("PAGE_COUNT", 20))
 TARGET_COURSE = os.getenv("TARGET_COURSE", "SANDBOX")
+SANDBOX_COURSE_ID = os.getenv("SANDBOX_COURSE_ID",768575)
 ORG_NAME = os.getenv("ORG_NAME", "qatrack")
 ELICE_COURSE_ID = int(os.getenv("ELICE_COURSE_ID", 766557))
 LECTURE_ID = int(os.getenv("LECTURE_ID", 6644275))
+ORGANIZATION_ID = os.getenv("ORGANIZATION_ID",4653)
 
 # ============================================================
 # 5) API 호출 시 기본 파라미터
