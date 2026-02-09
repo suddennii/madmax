@@ -3,6 +3,7 @@
 - 클래스 홈테스트 수행 코드
 
 작성자 : 신윤아 / 작성일 : 26.02.04
+작성자 : 신윤아 / 수정일 : 26.02.09
 
 테스트 목적 :
 -클래스홈 API의 정상/에러 응답을 검증한다.
@@ -15,10 +16,12 @@
 '''
 import os 
 import pytest
-from datetime import datetime
+import json
+from datetime import datetime,timezone
 from utils.api_client import ApiClient
 from utils.auth_manager import AuthManager
-from utils.config import CLASSROOM_ID,ACCOUNT_ID
+from utils.datetime_helper import select_time
+from utils.config import CLASSROOM_ID,ACCOUNT_ID,ACCOUNT_ID2,SANDBOX_COURSE_ID,ELICE_COURSE_ID
 #--------------------------------------------------------------------
 # HOME_01[공통] 클래스홈 페이지 접속    
 #--------------------------------------------------------------------
@@ -163,5 +166,226 @@ def test_get_progress():
         assert isinstance(res[field],data_type),f"{field}필드는 {data_type}타입이여야 합니다."
     
 #--------------------------------------------------------------------
-# HOME_10[학습진행률] get요청(다른사람account_id2)
+# HOME_11[학습진행률] get요청(다른사람account_id2)
 #-------------------------------------------------------------------- 
+#fail이 떠야 정상... 왜냐면 개인정보를 볼 수 있으니까요
+def test_get_progress2():
+    token = AuthManager.get_token()
+    client = ApiClient(token=token,url_type="dash")
+    params = {"classroom_id":CLASSROOM_ID}
+    with pytest.raises(Exception) as e:
+        res = client.get(f"/student/{ACCOUNT_ID2}", params=params)
+        
+    expected_fields = {
+        "learning_progress"  : str,
+        "test_score" : str,
+        "practice_score" : str,
+        "submit_cnt" : int,
+        "test_completed_cnt" : int
+    }
+    for field,data_type in expected_fields.items():
+        assert field in res,f"응답에 {field}가 없습니다."
+        assert isinstance(res[field],data_type),f"{field}필드는 {data_type}타입이여야 합니다."
+
+#--------------------------------------------------------------------
+# HOME_12[오늘의 일정] 날짜이동 테스트
+#-------------------------------------------------------------------- 
+def test_get_todo():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(2026, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "classroom_id":CLASSROOM_ID,
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base,offset_days=1) }
+       
+    res = client.get(f"/schedule/count",params=params)
+    
+    
+    assert "count" in res
+    assert isinstance(res["count"],int)
+    assert res["count"] >= 0
+   
+#--------------------------------------------------------------------
+# HOME_13[오늘의 일정] 일정목록 get요청
+#-------------------------------------------------------------------- 
+def test_get_todolist():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(2026, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "classroom_id":CLASSROOM_ID,
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base,offset_days=1),
+        "count" : 20}
+    res = client.get(f"/schedule/ics",params=params)
+    
+    #JSON을 반환하지않고 .ics를 반환
+    assert isinstance(res, str)
+    assert "BEGIN:VCALENDAR" in res
+    assert "SUMMARY" in res
+    assert "END:VCALENDAR" in res
+    
+#--------------------------------------------------------------------
+# HOME_14[오늘의 일정] 필수 param제거(class_id)
+#-------------------------------------------------------------------- 
+def test_get_todolist_no_classid():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(2026, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base,offset_days=1),
+        "count" : 20}
+    
+    with pytest.raises(Exception) as e:
+        client.get(f"/schedule/ics",params=params)
+    assert "422" in str(e.value)
+    
+#--------------------------------------------------------------------
+# HOME_15[오늘의 일정] 유효하지 않은 날짜 검증
+#-------------------------------------------------------------------- 
+def test_get_past_date():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(202, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base,offset_days=1),
+        "count" : 20}
+    
+    with pytest.raises(Exception) as e:
+        client.get(f"/schedule/ics",params=params)
+    assert "422" in str(e.value)
+    
+#--------------------------------------------------------------------
+# HOME_16[오늘의 일정] 동일한 날짜 입력
+#-------------------------------------------------------------------- 
+def test_same_date():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(2026, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "classroom_id":CLASSROOM_ID,
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base),
+        "count" : 20}
+    res = client.get(f"/schedule/ics",params=params)
+    
+    #JSON을 반환하지않고 .ics를 반환
+    #동일한 시간 입력시 summary는 존재 X
+    assert isinstance(res, str)
+    assert "BEGIN:VCALENDAR" in res
+    assert "SUMMARY" not in res
+    assert "END:VCALENDAR" in res
+    
+#--------------------------------------------------------------------
+# HOME_17[오늘의 일정] 동일한 날짜 입력
+#-------------------------------------------------------------------- 
+def test_more_date_ge():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    client.session.headers.update({"X-Elice-Org-Name-Short": "qatrack"})
+    base = datetime(2026, 2, 9, 0, 0, tzinfo=timezone.utc)
+    params = {
+        "classroom_id":CLASSROOM_ID,
+        "dt_start_ge": select_time(base_dt=base),
+        "dt_start_le": select_time(base_dt=base,offset_days=-1),
+        "count" : 20}
+    
+    with pytest.raises(Exception) as e:
+        client.get(f"/schedule/ics",params=params)
+    assert "409" in str(e.value)
+    assert "invalid_datetime_format" in str(e.value)
+    
+#--------------------------------------------------------------------
+# HOME_18[학습현황] 과목 페이징 get요청
+#--------------------------------------------------------------------
+def test_get_sublist():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="dash")
+    params = {
+        "classroom_id":CLASSROOM_ID,
+        "offset" : 5,
+        "count": 5
+    }
+    res = client.get(f"/student/{ACCOUNT_ID}/course",params=params)
+    
+    assert isinstance(res, list), "응답은 list여야 합니다."
+    assert len(res) == params["count"], (
+        f"응답 개수는 {params['count']}개여야 합니다."
+    )
+
+    expected_fields = {
+        "course": dict,
+        "learning_progress": str,
+        "test_score": str,
+        "practice_score": str,
+        "submit_cnt": int,
+        "test_completed_cnt": int,
+    }
+    course_fields = {
+        "id": int,
+        "title": str,
+        "course_type": int,
+        "logo_url": (str, type(None)),
+    }
+
+    for idx, item in enumerate(res):
+        assert isinstance(item, dict), f"{idx}번째 요소는 dict여야 합니다."
+
+        for field, data_type in expected_fields.items():
+            assert field in item, f"{idx}번째 요소에 {field}가 없습니다."
+            assert isinstance(item[field], data_type), (
+                f"{idx}번째 요소의 {field}는 {data_type} 타입이어야 합니다."
+            )
+
+        #course내부 검증
+        course = item["course"]
+        for field, data_type in course_fields.items():
+            assert field in course, f"{idx}번째 course에 {field}가 없습니다."
+            assert isinstance(course[field], data_type), (
+                f"{idx}번째 course의 {field}는 {data_type} 타입이어야 합니다."
+            )
+
+#--------------------------------------------------------------------
+# HOME_20[학습현황] 세부과목 페이지 불러오기
+#--------------------------------------------------------------------
+def test_detail_sub_get():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    res = client.get(f"/classroom/{CLASSROOM_ID}/course/{SANDBOX_COURSE_ID}")
+    
+    assert res["title"] == "SANDBOX"
+    
+#--------------------------------------------------------------------
+# HOME_21[학습현황] 다른 account_id로 get요청 시도
+#--------------------------------------------------------------------
+def test_account2_get_sub():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="rest")
+    params = {
+        "course_id":ELICE_COURSE_ID,
+        "user_id" : ACCOUNT_ID2
+    }
+    
+    res = client.get(f"/org/qatrack/dashboard/user/lecture_page/list/",params=params)
+    
+    assert res["_result"]["status_code"] == 409
+    assert res["fail_code"] == "insufficient_permission"
+    
+#--------------------------------------------------------------------
+# HOME_22[info] 수강생계정으로 로그인시 get요청 실패
+#--------------------------------------------------------------------
+def test_login_student_account_failget():
+    token = AuthManager.get_token()
+    client = ApiClient(token = token,url_type="classroom")
+    with pytest.raises(Exception) as e:
+        client.get(f"/classroom/{CLASSROOM_ID}/classroom_ticket/info")
+    assert "has_no_permission" in str(e.value)
+

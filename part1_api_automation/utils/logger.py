@@ -1,3 +1,20 @@
+"""
+파일 목적 : 프로젝트 전역에서 공통으로 사용하는 로거(Logger) 생성 유틸리티
+
+작성자 : 박지우 / 작성일 : 2026-02-04
+작성자 : - / 수정일 : -
+
+설정 목적 :
+- 모듈별로 독립된 로거를 생성하여 파일 및 콘솔에 동시에 출력한다.
+- logs 디렉토리 아래에 날짜별로 로그 파일을 자동 생성한다.
+- TimedRotatingFileHandler를 사용하여 자정마다 로그 파일을 회전(rotate)하고,
+  최대 14일치 로그를 보관한다.
+
+기타 주의 사항 :
+- logger.handlers.clear()로 중복 핸들러 등록을 방지한다.
+- 프로젝트 루트 기준으로 logs 폴더가 자동 생성된다.
+"""
+
 import logging
 import os
 from datetime import datetime
