@@ -13,6 +13,8 @@
 기타 주의 사항 : 없음
 """
 import pytest
+import requests
+
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
 from utils.board_api import BoardAPI
@@ -50,8 +52,22 @@ def client_factory():
 # ---------------------------------------------------------
 # Board API Wrapper
 # ---------------------------------------------------------
+@pytest.fixture(scope="session")
+def client():
+    session = requests.Session()
+    session.headers.update({
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    })
+    session.status_code = None 
+
+    yield session
+    session.close()
+
 @pytest.fixture
 def board_api(client):
+    """
+    BoardAPI 인스턴스를 생성하고 client를 주입
+    """
+    from utils.board_api import BoardAPI 
     return BoardAPI(client)
-
-
