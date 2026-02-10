@@ -106,3 +106,8 @@ SCENARIO_LOAD_TEST = [
         }
     }
 ]
+# ============================================================
+# 6) 세션 키 (Board API 인증용)
+# SESSION_KEY가 없으면 TOKEN을 사용
+# ============================================================
+SESSION_KEY = os.getenv("SESSION_KEY", os.getenv("TOKEN"))
