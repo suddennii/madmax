@@ -82,21 +82,6 @@ DEFAULT_PARAMS = {
     "elice_course_id": ELICE_COURSE_ID
 }
 
-# === 학생-강좌 엔드포인트 빌드 ===
-def build_student_course_endpoint(params):
-    return student_course(
-        account_id=params.get("account_id"),
-        classroom_id=params.get("classroom_id"),
-        filter_title=params.get("filter_title"),
-        offset=params.get("offset"),
-        skip=params.get("skip"),
-        count=params.get("count")
-    )
-def build_student_account_endpoint(params):
-    return student_account(
-        account_id=params.get("account_id"),
-        classroom_id=params.get("classroom_id")
-    )
 SCENARIO_LOAD_TEST = [
     {
         "name": "material_quiz_get_before",
