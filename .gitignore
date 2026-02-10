@@ -1,0 +1,23 @@
+.gitignore
+part1_api_automation/.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+
+# pytest cache
+.pytest_cache/
+
+# Environment files
+.env
+
+# VSCode settings
+.vscode/
+
+# 자동화 part2 준비중
+# part2_api_automation
+# Jenkinsfile
