@@ -2,6 +2,7 @@
 파일 목적 : 
 수업일정 API 기능 검증 코드
 작성자 : 김건후 / 작성일 : 26.02.04
+작성자 : 김건후 / 수정일 : 26.02.09
 테스트 목적 : 
 -수업일정 API의 정상 응답 및 데이터 정합성을 검증한다.
 '''
@@ -23,6 +24,7 @@ test_data = [
      "2026-02-14T15:00:00.000Z","2026-04-14T14:59:59.999Z", None)
 ]
 
+#자동화코드 [1] ---------------------------------------
 @pytest.mark.course
 @pytest.mark.parametrize("tc_id, desc, start_ge, start_le, target_date", test_data)
 def test_get_schedule_list(token, tc_id, desc, start_ge, start_le, target_date):
@@ -114,6 +116,7 @@ detail_test_data = [
     }
 ]
 
+#자동화코드 [2] ---------------------------------------
 @pytest.mark.course
 @pytest.mark.parametrize("data", detail_test_data)
 def test_get_detail_info(token, data):
@@ -151,7 +154,7 @@ def test_get_detail_info(token, data):
     
     logger.info(f"✅ {data['tc_id']} 성공: '{data['exp_title']}' 항목을 확인했습니다.")
 
-
+#자동화코드 [3] ---------------------------------------
 @pytest.mark.course
 def test_get_detail_unauthorized_body_check(token):
     """
@@ -191,6 +194,7 @@ boundary_data = [
     ("SCH-11", "미래 날짜(2099년)", "2099-01-17T15:00:00.000Z", "2099-03-14T14:59:59.999Z")
 ]
 
+#자동화코드 [4] ---------------------------------------
 @pytest.mark.course
 @pytest.mark.parametrize("tc_id, desc, start_ge, start_le", boundary_data)
 def test_get_schedule_boundary(token, tc_id, desc, start_ge, start_le):
@@ -228,7 +232,7 @@ def test_get_schedule_boundary(token, tc_id, desc, start_ge, start_le):
         assert "400" in str(e), f"[{tc_id}] 400 에러를 기대했으나 다른 에러 발생: {e}"
         logger.info(f"✅ {tc_id}: 서버가 400 에러로 정상 차단함")
 
-
+#자동화코드 [5] ---------------------------------------
 @pytest.mark.course
 def test_get_schedule_missing_org_header(token):
     """
