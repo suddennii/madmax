@@ -1,3 +1,4 @@
+.gitignore
 part1_api_automation/.env
 
 # Python cache
@@ -16,3 +17,7 @@ logs/
 
 # VSCode settings
 .vscode/
+
+# 자동화 part2 준비중
+# part2_api_automation
+# Jenkinsfile

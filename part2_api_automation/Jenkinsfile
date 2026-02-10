@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // VM 내의 JMeter 실행 경로 (실제 설치 경로로 수정 필요)
+        // VM 내의 JMeter 실행 경로
         JMETER_BIN = "jmeter" 
         WORKING_DIR = "part2_api_automation"
     }
@@ -12,21 +12,23 @@ pipeline {
             steps {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
-                    branch: 'main', 
-                    credentialsId: 'oauth2' // Jenkins에 등록한 Credential ID
+                    branch: 'dev', 
+                    credentialsId: 'oauth2'
             }
         }
+
         stage('Connection Check') {
             steps {
-                // 파일이 잘 가져와졌는지 폴더 목록만 출력해 봅니다.
+                // 파일이 잘 가져와졌는지 폴더 목록만 출력
                 sh "ls -R"
                 echo "✅ 깃랩 연결 및 파일 체크아웃 성공!"
             }
         }
-/*
+
+        /* 나중에 코드가 준비되면 아래 stage들의 주석을 해제하세요. 
         stage('Environment Setup') {
             steps {
-                    sh """
+                sh """
                     cd ${WORKING_DIR}
                     python3 -m venv venv
                     . venv/bin/activate
@@ -48,37 +50,23 @@ pipeline {
 
         stage('Run JMeter (Performance Test)') {
             steps {
-                // -n: non-gui 모드, -t: jmx파일, -l: 결과jtl파일, -e -o: 대시보드 리포트 생성
                 sh """
-                    # 1. 성능 테스트 폴더로 이동 (users.csv와 .jmx가 있는 곳)
                     cd ${WORKING_DIR}/performance_tests
-
-                    # 2. 리포트가 저장될 폴더 미리 생성 (기존 리포트가 있다면 삭제 후 재생성 권장)
                     rm -rf reports
                     mkdir -p reports/jmeter_dashboard
-
-                    # 3. JMeter 실행
-                    # -t: 현재 폴더(performance_tests)에 있으므로 파일명만 적습니다.
-                    # -l & -o: 결과 파일은 생성한 reports 폴더 안으로 지정합니다.
                     ${JMETER_BIN} -n -t load_test2.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
                 """
             }
         }
-    }
+        */
+    } // stages 끝
 
     post {
         always {
-            // Jenkins Performance 플러그인이 설치되어 있어야 함
-            perfReport errorFailedThreshold: 20, sourceDataFiles: "${WORKING_DIR}/reports/result.jtl"
-            
-            // 결과 파일들을 Jenkins 빌드 결과물로 아카이빙
-            archiveArtifacts artifacts: "${WORKING_DIR}/reports/**", allowEmptyArchive: true
-        }
-    }
-*/
-    post {
-        always {
+            // 연결 확인 시에는 에코만 남겨둡니다. 
+            // 나중에 아카이빙이 필요하면 아래 주석들을 해제하세요.
+            // archiveArtifacts artifacts: "${WORKING_DIR}/reports/**", allowEmptyArchive: true
             echo "파이프라인 실행이 완료되었습니다."
         }
     }
-}
+} // pipeline 끝
