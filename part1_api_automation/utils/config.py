@@ -56,6 +56,7 @@ TIMEOUT = int(os.getenv("TIMEOUT", 10))
 RETRY = int(os.getenv("RETRY", 3))
 REST_BASE_URL = config["rest_base_url"]
 CLASSROOM_BASE_URL = config["classroom_base_url"]
+CLASSROOM_ID2 = os.getenv("CLASSROOM_ID2")
 
 # ============================================================
 # 4) 상수 정의
@@ -63,9 +64,11 @@ CLASSROOM_BASE_URL = config["classroom_base_url"]
 PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
 PAGE_COUNT = int(os.getenv("PAGE_COUNT", 20))
 TARGET_COURSE = os.getenv("TARGET_COURSE", "SANDBOX")
+SANDBOX_COURSE_ID = os.getenv("SANDBOX_COURSE_ID",768575)
 ORG_NAME = os.getenv("ORG_NAME", "qatrack")
 ELICE_COURSE_ID = int(os.getenv("ELICE_COURSE_ID", 766557))
 LECTURE_ID = int(os.getenv("LECTURE_ID", 6644275))
+ORGANIZATION_ID = os.getenv("ORGANIZATION_ID",4653)
 
 # ============================================================
 # 5) API 호출 시 기본 파라미터
@@ -78,3 +81,43 @@ DEFAULT_PARAMS = {
     "count": int(os.getenv("DEFAULT_COUNT", 40)),
     "elice_course_id": ELICE_COURSE_ID
 }
+
+# === 학생-강좌 엔드포인트 빌드 ===
+def build_student_course_endpoint(params):
+    return student_course(
+        account_id=params.get("account_id"),
+        classroom_id=params.get("classroom_id"),
+        filter_title=params.get("filter_title"),
+        offset=params.get("offset"),
+        skip=params.get("skip"),
+        count=params.get("count")
+    )
+def build_student_account_endpoint(params):
+    return student_account(
+        account_id=params.get("account_id"),
+        classroom_id=params.get("classroom_id")
+    )
+SCENARIO_LOAD_TEST = [
+    {
+        "name": "material_quiz_get_before",
+        "method": "GET",
+        "url": "/org/qatrack/material_quiz/get/",
+        "params": {
+            "material_quiz_id": 54716206
+        }
+    },
+    {
+        "name": "lecture_test_stop",
+        "method": "POST",
+        "url": "/org/qatrack/user/lecture/test/stop/",
+        "params": {}
+    },
+    {
+        "name": "material_quiz_get_after",
+        "method": "GET",
+        "url": "/org/qatrack/material_quiz/get/",
+        "params": {
+            "material_quiz_id": 54716206
+        }
+    }
+]
