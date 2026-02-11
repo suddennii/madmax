@@ -43,6 +43,18 @@ pipeline {
                 """
             }
         }
+        
+        stage('Load ENV File') {
+            steps {
+                withCredentials([file(credentialsId: 'madmax-env-file', variable: 'ENV_FILE')]) {
+                    sh """
+                        cp $ENV_FILE ${TEST_DIR1}/.env
+                        echo " .env 파일 복사 완료"
+                    """
+                }
+            }
+        }
+
 
         stage('Run Pytest (API Automation)') {
             steps {
