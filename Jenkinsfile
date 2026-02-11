@@ -49,7 +49,7 @@ pipeline {
                 sh """
                     cd ${TEST_DIR1}
                     . venv/bin/activate
-                    pytest tests/test_sub.py --html=reports/pytest_report.html --self-contained-html
+                    pytest tests/test_dash.py --html=reports/pytest_report.html --self-contained-html
                 """
             }
         }
