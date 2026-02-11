@@ -10,7 +10,7 @@ pipeline {
         ACCOUNT_ID2 = credentials('account-id2')
         USER_TOKEN = credentials('user-token-1')
     }
-
+  
     stages {
 
         stage('Clone Repository') {
