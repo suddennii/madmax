@@ -8,6 +8,7 @@ pipeline {
         TEST_DIR1 = "part1_api_automation"
         TEST_DIR2 = "part2_api_automation"
         ACCOUNT_ID = credentials('account-id')
+        ACCOUNT_ID2 = credentials('account-id2')
     }
 
     stages {
