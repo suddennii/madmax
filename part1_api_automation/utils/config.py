@@ -39,10 +39,17 @@ config = {
 # 2) YAML 로더
 #    - 설정 파일(.yaml) 읽기용 유틸 함수
 # ============================================================
-def load_yaml(path:str):
-    file_path=Path(path)
+# def load_yaml(path:str):
+#     file_path=Path(path)
+#     with file_path.open(encoding='utf-8') as f:
+#         return yaml.safe_load(f)
+def load_yaml(relative_path: str):
+    # 현재 파일(config.py)의 위치 기준으로 절대경로 생성
+    base_dir = Path(__file__).resolve().parent.parent
+    file_path = base_dir / relative_path
     with file_path.open(encoding='utf-8') as f:
         return yaml.safe_load(f)
+
 
 # ============================================================
 # 3) 공통 환경 설정값
