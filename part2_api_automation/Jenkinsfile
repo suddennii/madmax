@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+    
+    environment {
+        // VM 내의 JMeter 실행 경로
+        JMETER_BIN = "jmeter" 
+        WORKING_DIR = "part2_api_automation"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // GitLab 주소 및 인증정보 설정
+                git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
+                    branch: 'dev', 
+                    credentialsId: 'oauth2'
+            }
+        }
+
+        stage('Connection Check') {
+            steps {
+                // 파일이 잘 가져와졌는지 폴더 목록만 출력
+                sh "ls -R"
+                echo "✅ 깃랩 연결 및 파일 체크아웃 성공!"
+            }
+        }
+
+        /* 나중에 코드가 준비되면 아래 stage들의 주석을 해제하세요. 
+        stage('Environment Setup') {
+            steps {
+                sh """
+                    cd ${WORKING_DIR}
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                """
+            }
+        }
+
+        stage('Run Pytest (API Automation)') {
+            steps {
+                sh """
+                    cd ${WORKING_DIR}
+                    . venv/bin/activate
+                    pytest tests/ --html=reports/pytest_report.html --self-contained-html
+                """
+            }
+        }
+
+        stage('Run JMeter (Performance Test)') {
+            steps {
+                sh """
+                    cd ${WORKING_DIR}/performance_tests
+                    rm -rf reports
+                    mkdir -p reports/jmeter_dashboard
+                    ${JMETER_BIN} -n -t load_test2.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
+                """
+            }
+        }
+        */
+    } // stages 끝
+
+    post {
+        always {
+            // 연결 확인 시에는 에코만 남겨둡니다. 
+            // 나중에 아카이빙이 필요하면 아래 주석들을 해제하세요.
+            // archiveArtifacts artifacts: "${WORKING_DIR}/reports/**", allowEmptyArchive: true
+            echo "파이프라인 실행이 완료되었습니다."
+        }
+    }
+} // pipeline 끝
