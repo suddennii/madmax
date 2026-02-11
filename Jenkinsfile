@@ -4,7 +4,8 @@ pipeline {
     environment {
         // VM 내의 JMeter 실행 경로
         JMETER_BIN = "jmeter" 
-        WORKING_DIR = "part2_api_automation"
+        TEST_DIR1 = "part1_api_automation"
+        TEST_DIR2 = "part2_api_automation"
     }
 
     stages {
@@ -12,7 +13,7 @@ pipeline {
             steps {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
-                    branch: 'dev', 
+                    branch: 'main', 
                     credentialsId: 'oauth2'
             }
         }
@@ -25,11 +26,11 @@ pipeline {
             }
         }
 
-        /* 나중에 코드가 준비되면 아래 stage들의 주석을 해제하세요. 
+        
         stage('Environment Setup') {
             steps {
                 sh """
-                    cd ${WORKING_DIR}
+                    cd ${TEST_DIR1}
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
@@ -41,17 +42,17 @@ pipeline {
         stage('Run Pytest (API Automation)') {
             steps {
                 sh """
-                    cd ${WORKING_DIR}
+                    cd ${TEST_DIR1}
                     . venv/bin/activate
-                    pytest tests/ --html=reports/pytest_report.html --self-contained-html
+                    pytest tests/test_sub.py --html=reports/pytest_report.html --self-contained-html
                 """
             }
         }
-
+        /* 나중에 코드가 준비되면 아래 stage들의 주석을 해제하세요. 
         stage('Run JMeter (Performance Test)') {
             steps {
                 sh """
-                    cd ${WORKING_DIR}/performance_tests
+                    cd ${TEST_DIR2}/performance_tests
                     rm -rf reports
                     mkdir -p reports/jmeter_dashboard
                     ${JMETER_BIN} -n -t load_test2.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
@@ -63,10 +64,9 @@ pipeline {
 
     post {
         always {
-            // 연결 확인 시에는 에코만 남겨둡니다. 
-            // 나중에 아카이빙이 필요하면 아래 주석들을 해제하세요.
-            // archiveArtifacts artifacts: "${WORKING_DIR}/reports/**", allowEmptyArchive: true
-            echo "파이프라인 실행이 완료되었습니다."
+            // Part 1 폴더 안에 생성된 리포트를 젠킨스 대시보드에 저장
+            archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
+            echo "✅ 모든 공정이 완료되었습니다."
         }
     }
 } // pipeline 끝
