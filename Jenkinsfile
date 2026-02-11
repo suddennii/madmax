@@ -14,7 +14,7 @@ pipeline {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://github.com/suddennii/madmax.git', 
                     branch: 'TC1', 
-                    credentialsId: 'github-madmax'
+                    credentialsId: 'github-token'
             }
         }
 
