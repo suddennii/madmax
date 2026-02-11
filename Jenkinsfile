@@ -50,7 +50,7 @@ pipeline {
                         sh """
                             cp "$ENV_FILE" "$WORKSPACE/${TEST_DIR1}/.env"
                         """
-                    }
+                    
 
                 }
             }
