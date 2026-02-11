@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+     
     environment {
         JMETER_BIN = "jmeter"
         TEST_DIR1 = "part1_api_automation"
