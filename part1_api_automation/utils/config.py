@@ -91,11 +91,11 @@ DEFAULT_PARAMS = {
 
 SCENARIO_LOAD_TEST = [
     {
-        "name": "material_quiz_get_before",
-        "method": "GET",
-        "url": "/org/qatrack/material_quiz/get/",
+        "name": "lecture_quiz_get_before",
+        "method": "POST",
+        "url": "/org/qatrack/user/lecture/test/enter/",
         "params": {
-            "material_quiz_id": 54716206
+            "lecture_id": 6658973
         }
     },
     {
@@ -105,11 +105,11 @@ SCENARIO_LOAD_TEST = [
         "params": {}
     },
     {
-        "name": "material_quiz_get_after",
-        "method": "GET",
-        "url": "/org/qatrack/material_quiz/get/",
+        "name": "lecture_quiz_get_after",
+        "method": "POST",
+        "url": "/org/qatrack/lecture/test/reset/by_self/",
         "params": {
-            "material_quiz_id": 54716206
+            "lecture_id": 6658973
         }
     }
 ]
