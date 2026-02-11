@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+
+    environment {
+        // 파이썬 가상환경 이름
+        VENV_NAME = 'venv'
+        // 결과 보고서 저장 폴더
+        REPORT_DIR = 'reports'
+    }
+
+    stages {
+        // 1. 깃랩에서 코드 가져오기 (TC3 브랜치)
+        stage('Checkout Code') {
+            steps {
+                // 젠킨스 Job 설정에 있는 브랜치(TC3)를 가져옵니다.
+                checkout scm
+            }
+        }
+
+        // 2. 환경 설정 (파이썬 가상환경 & 라이브러리 설치)
+        stage('Setup Environment') {
+            steps {
+                sh '''
+                    # 리포트 폴더 생성 (없으면 만들기)
+                    mkdir -p ${REPORT_DIR}
+
+                    # 파이썬 가상환경 생성
+                    python3 -m venv ${VENV_NAME}
+                    
+                    # 가상환경 활성화 및 패키지 설치
+                    . ${VENV_NAME}/bin/activate
+                    pip install --upgrade pip
+                    
+                    # requirements.txt가 있으면 설치, 없으면 필수 패키지 설치
+                    if [ -f requirements.txt ]; then
+                        pip install -r requirements.txt
+                    else
+                        pip install pytest requests
+                    fi
+                '''
+            }
+        }
+
+        // 3. API 기능/보안 테스트 (Pytest)
+        stage('Run Pytest (Functional)') {
+            steps {
+                sh '''
+                    . ${VENV_NAME}/bin/activate
+                    
+                    # test_board.py 실행 (결과는 JUnit XML로 저장)
+                    python3 -m pytest tests/test_board.py --junitxml=${REPORT_DIR}/pytest_result.xml
+                '''
+            }
+        }
+
+        // 4. 부하 테스트 (JMeter)
+        stage('Run JMeter (Performance)') {
+            steps {
+                // tests 폴더로 이동해서 실행해야 users.csv를 잘 찾습니다!
+                dir('tests') {
+                    sh '''
+                        # JMeter 실행 (비 GUI 모드)
+                        # -n: CLI 모드
+                        # -t: 시나리오 파일 (load_test2.jmx)
+                        # -l: 결과 데이터 저장 (result.jtl)
+                        # -e -o: HTML 리포트 생성 폴더
+                        
+                        jmeter -n -t load_test2.jmx \
+                        -l ../${REPORT_DIR}/jmeter_result.jtl \
+                        -e -o ../${REPORT_DIR}/jmeter_html
+                    '''
+                }
+            }
+        }
+    }
+
+    // 5. 결과 리포트 저장 (빌드 후 처리)
+    post {
+        always {
+            // Pytest 결과 그래프 (JUnit 플러그인 필요)
+            junit "${REPORT_DIR}/pytest_result.xml"
+            
+            // 빌드 아티팩트 저장 (JMeter 결과 파일 등)
+            archiveArtifacts artifacts: "${REPORT_DIR}/**/*", allowEmptyArchive: true
+        }
+        success {
+            echo "🎉 테스트 성공! (Pytest & JMeter Pass)"
+        }
+        failure {
+            echo "💥 테스트 실패... 로그를 확인하세요."
+        }
+    }
+}
