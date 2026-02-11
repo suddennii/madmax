@@ -9,6 +9,8 @@ pipeline {
         TEST_DIR2 = "part2_api_automation"
         ACCOUNT_ID = credentials('account-id')
         ACCOUNT_ID2 = credentials('account-id2')
+        USER_TOKEN = credentials('user-token-1')
+
     }
 
     stages {
