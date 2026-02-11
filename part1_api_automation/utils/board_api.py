@@ -1,35 +1,71 @@
 """
-2026-02-06 심다영
 게시판(Board) API 유틸리티 클래스
-- 게시글/댓글 CRUD, 좋아요, 목록 조회 기능
-- Multipart/form-data 전송 방식 사용
+
+작성자: 심다영 / 작성일: 2026-02-06
+수정자: 심다영 / 수정일: 2026-02-10
+
+수정 내역:
+- conftest.py의 client(requests.Session) 호환 유지
+- Multipart/form-data 전송 방식 적용
+- 댓글 정렬(sort_by JSON) 파라미터 지원 추가 (Fix)
+- board_api.status_code 사용 (client.status_code 대신)
+- Assert 검증 강화 (TC ID별 명확한 에러 메시지)
+- Negative TC 추가 (BOARD_12, BOARD_21~28)
+
+[지원 기능]
+- 게시글 CRUD (BOARD_11~15)
+- 게시글 좋아요 (BOARD_06, BOARD_08)
+- 목록 조회/검색/페이지네이션 (BOARD_01~05)
+- 댓글 CRUD (BOARD_16~20)
+- 댓글 좋아요 (BOARD_07, BOARD_09)
+- 댓글 정렬 (BOARD_17, BOARD_18)
 """
+import json
 from utils.config import CLASSROOM_ID, ORG_NAME, REST_BASE_URL, CLASSROOM_BASE_URL
 
 
 class BoardAPI:
-    """게시판 API 래퍼 클래스"""
+    """
+    게시판 API 래퍼 클래스
+    
+    conftest.py에서 주입받은 requests.Session 객체를 사용합니다.
+    """
     
     WRITE_PATH = "/org/qatrack/board/article"
 
     def __init__(self, client, org_name=ORG_NAME):
+        """
+        BoardAPI 초기화
+        
+        Args:
+            client: requests.Session 객체 (conftest.py에서 주입)
+            org_name: 조직명 (기본값: qatrack)
+        """
         self.client = client
-        self.client.session.headers.update({
+        self.client.headers.update({
             "x-elice-org-name-short": org_name
         })
+
+    @property
+    def status_code(self):
+        """마지막 요청의 상태 코드"""
+        return getattr(self.client, 'status_code', None)
 
     def _send_request(self, method, url, payload=None, params=None, extra_headers=None, files=None):
         """
         공통 요청 메서드
+        
         - POST: Multipart/form-data 형식으로 전송
         - GET: Query parameter 형식으로 전송
         """
-        headers = dict(self.client.session.headers)
-        headers["Content-Type"] = None  # requests가 자동으로 multipart 설정
+        headers = dict(self.client.headers)
+        headers["Content-Type"] = None
 
         if extra_headers:
             headers.update(extra_headers)
 
+        response = None
+        
         if method == "POST":
             multi_part_data = {}
             
@@ -41,10 +77,11 @@ class BoardAPI:
             if files:
                 multi_part_data.update(files)
             
-            response = self.client.session.post(url, files=multi_part_data, headers=headers)
+            response = self.client.post(url, files=multi_part_data, headers=headers)
         else:
-            response = self.client.session.get(url, params=params, headers=headers)
-            
+            filtered_params = {k: v for k, v in (params or {}).items() if v is not None}
+            response = self.client.get(url, params=filtered_params, headers=headers)
+        
         self.client.status_code = response.status_code
 
         try:
@@ -102,16 +139,20 @@ class BoardAPI:
 
     def get_list(self, skip=0, count=10, **kwargs):
         """게시글 목록 조회 (BOARD_01~05)"""
-        read_url = f"{CLASSROOM_BASE_URL}/classroom/{CLASSROOM_ID}/article"
+        url = f"{CLASSROOM_BASE_URL}/classroom/{CLASSROOM_ID}/article"
         
-        params = {"skip": skip, "count": count}
-        if 'raise_error' in kwargs:
-            del kwargs['raise_error']
+        params = {}
+        
+        if skip is not None:
+            params["skip"] = skip
+        if count is not None:
+            params["count"] = count
         
         extra_headers = kwargs.pop('headers', None)
+        kwargs.pop('raise_error', None)
         params.update(kwargs)
         
-        return self._send_request("GET", read_url, params=params, extra_headers=extra_headers)
+        return self._send_request("GET", url, params=params, extra_headers=extra_headers)
 
     def get_article(self, article_id):
         """특정 게시글 ID로 상세 정보 조회 (BOARD_12)"""
@@ -129,7 +170,9 @@ class BoardAPI:
             elif isinstance(response, dict):
                 if "detail" in response or "_result" in response:
                     continue
-                articles = response.get("articles") or response.get("data") or response.get("results") or []
+                articles = response.get("articles") or \
+                           response.get("data") or \
+                           response.get("results") or []
             
             if not articles:
                 break
@@ -188,27 +231,21 @@ class BoardAPI:
         return self._send_request("POST", url, payload=payload)
 
     # =========================================================
-    # 댓글 목록 조회
+    # 댓글 목록 조회 (수정됨: sort_by JSON 파라미터 사용)
     # =========================================================
 
     def get_comments(self, article_id, offset=0, count=20, sort=None):
-        """댓글 목록 조회 (Classroom API 사용으로 변경)"""
-        # [변경 1] URL 변경: REST_BASE_URL -> CLASSROOM_BASE_URL
-        # 패턴: /classroom/{cid}/article/{aid}/comment
-        url = f"{CLASSROOM_BASE_URL}/classroom/{CLASSROOM_ID}/article/{article_id}/comment"
-        
-        # [변경 2] 파라미터 변경: offset -> skip (get_list와 통일), board_article_id 제거(URL에 포함됨)
+        """댓글 목록 조회 (BOARD_17, BOARD_18)"""
+        url = f"{REST_BASE_URL}{self.WRITE_PATH}/comment/list/"
         params = {
-            "skip": offset, 
+            "board_article_id": article_id,
+            "offset": offset,
             "count": count
         }
         
         if sort:
-            params["sort"] = sort
-            
-        # [디버깅] 변경된 요청 로그 확인
-        print(f"\n[DEBUG] GET Comments (Classroom API) -> URL: {url}, Params: {params}")
-
-        return self._send_request("GET", url, params=params)
-
+            order = "desc" if str(sort).startswith("-") else "asc"
+            sort_payload = {"key": "created_datetime", "order": order}
+            params["sort_by"] = json.dumps(sort_payload)
         
+        return self._send_request("GET", url, params=params)
