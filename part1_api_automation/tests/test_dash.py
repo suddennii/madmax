@@ -24,6 +24,7 @@ from utils.assertions import log_response
 # ------------------------------------------------------------
 # 1) course list (Positive)
 # 과목 조회 및 과목 당 progress, score 정상 조회 확인
+# DASH-T01 DASH-T02  DASH-T03  DASH-T05
 # ------------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["params"]
 @pytest.mark.parametrize("params", data)
@@ -43,6 +44,7 @@ def test_course_list(client_factory, token, params):
 # ------------------------------------------------------------
 # 2) Course List - Missing Params (Negative)
 # 필수 마라미터 누락 시 API 응답 확인
+# DASH-T06
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["no_params"]
 @pytest.mark.parametrize("params", data)
@@ -54,6 +56,7 @@ def test_no_param(client_factory, token, params):
 # ------------------------------------------------------------
 # 3) Course List - Wrong Params (Negative)
 # 잘못된 파라미터 값 입력시 API 응답 값 확인
+# DASH-T07 DASH-T08 DASH-T19 DASH-T20 DASH-T21 DASH-T22
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["wrong_params"]
 @pytest.mark.parametrize("params", data)
@@ -63,19 +66,27 @@ def test_wrong_param(client_factory, token, params):
     assert_negative_api_call(client, endpoint, params["expected"])
 
 # ------------------------------------------------------------
-# 4) No Token (Negative)
-# 인증 토큰이 없을 때 응답 거절 확인
+# 4) No Token all (Negative)
+# 인증 토큰이 없을 때 응답 거절 확인 (url)
+# DASH-T04 DASH-T11 DASH-T16
 # -----------------------------------------------------------
-data = load_yaml("test_data/basic.yml")["params"]
-@pytest.mark.parametrize("params", data)
-def test_no_token(client_factory, no_token, params):
-    client = client_factory(no_token, "dash")
-    endpoint = build_student_course_endpoint(params)
-    assert_negative_api_call(client, endpoint, {"code": 403, "type": "no_access_token"})
+DATA = load_yaml("test_data/basic.yml")
+TEST_CASES = [
+    ("dash", DATA["params"]),
+    ("classroom", DATA["classroom_params"]),
+    ("dash", DATA["account_no_token"]),
+]
+@pytest.mark.parametrize("url_type, params_list", TEST_CASES)
+def test_no_token_all(client_factory, no_token, url_type, params_list):
+    for params in params_list:
+        client = client_factory(no_token, url_type)
+        endpoint = build_student_course_endpoint(params)
+        assert_negative_api_call(client, endpoint, {"code": 403, "type": "no_access_token"})
 
 # ------------------------------------------------------------
 # 5) Classroom List (Positive)
 # 파라미터 설정에 따라 값이 정상 출력되는지 확인
+# DASH-T09 DASH-T10 
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["classroom_params_positive"]
 @pytest.mark.parametrize("params", data)
@@ -89,7 +100,8 @@ def test_dash_classroom_list(client_factory, token, params):
 # ------------------------------------------------------------
 # 6) Classroom List (Negative)
 # classroom id 값이 잘못 들어갔을 때 api 응답 테스트
-# params1 에서 422가 떠야하는데 500이 뜸
+# params1 에서 422가 떠야하는데 500이 뜸 (count 파라미터 음수)
+# DASH-T12 DASH-T13
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["classroom_params_negative"]
 @pytest.mark.parametrize("params", data)
@@ -101,6 +113,7 @@ def test_dash_classroom_list_negative(client_factory, token, params):
 # ------------------------------------------------------------
 # 7) Account Info (Positive)
 # 올바른 id의 정보가 조회 되는지 확인
+# DASH-T14
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["account"]
 @pytest.mark.parametrize("params", data)
@@ -114,6 +127,7 @@ def test_dash_account_list(client_factory, token, params):
 # ------------------------------------------------------------
 # 8) Account Info (Negative)
 # 토큰 정보가 다른 account_id로 조회 거절되어야 하나 조회됨
+# DASH-T15
 # -----------------------------------------------------------
 data = load_yaml("test_data/basic.yml")["account_negative"]
 @pytest.mark.parametrize("params", data)

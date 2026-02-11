@@ -82,6 +82,22 @@ wrong_params:
       code: 422
       type : "greater_than_equal"
 
+account_no_token:
+  - account_id: 8861406
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861406
+      code: 403
+      type : "no_access_token"
+
+classroom_params :
+  - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    filter_title: "%25%25"
+    skip: 0
+    count: 5
+    expected:
+      code: 200
+      items: 40
 
 classroom_params_positive :
   - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
@@ -130,3 +146,4 @@ account_negative:
       id: 8861863
       code: 403
       type : "no_access_token"
+
