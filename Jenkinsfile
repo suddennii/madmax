@@ -52,7 +52,11 @@ pipeline {
 
         stage('Run Pytest (API Automation)') {
             steps {
-               sh "cp ${ENV_FILE} ${WORKSPACE}/${TEST_DIR1}/.env"
+                sh """
+                    cd ${TEST_DIR1}
+                    . venv/bin/activate
+                    pytest tests/test_dash.py --html=reports/pytest_report.html --self-contained-html
+                """
             }
         }
 
