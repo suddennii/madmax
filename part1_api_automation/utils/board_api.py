@@ -20,7 +20,7 @@
 - 댓글 좋아요 (BOARD_07, BOARD_09)
 - 댓글 정렬 (BOARD_17, BOARD_18)
 """
-import json # [추가] 정렬 파라미터 구성을 위해 필요
+import json
 from utils.config import CLASSROOM_ID, ORG_NAME, REST_BASE_URL, CLASSROOM_BASE_URL
 
 
@@ -41,7 +41,6 @@ class BoardAPI:
             client: requests.Session 객체 (conftest.py에서 주입)
             org_name: 조직명 (기본값: qatrack)
         """
-        # [주석 추가] conftest.py에서 생성된 session(헤더+쿠키 포함)을 그대로 사용합니다.
         self.client = client
         self.client.headers.update({
             "x-elice-org-name-short": org_name
@@ -50,7 +49,6 @@ class BoardAPI:
     @property
     def status_code(self):
         """마지막 요청의 상태 코드"""
-        # [주석 추가] 테스트 코드에서 board_api.status_code로 접근 가능하게 함
         return getattr(self.client, 'status_code', None)
 
     def _send_request(self, method, url, payload=None, params=None, extra_headers=None, files=None):
@@ -61,8 +59,6 @@ class BoardAPI:
         - GET: Query parameter 형식으로 전송
         """
         headers = dict(self.client.headers)
-        
-        # Multipart 전송 시 Content-Type을 None으로 설정
         headers["Content-Type"] = None
 
         if extra_headers:
@@ -71,7 +67,6 @@ class BoardAPI:
         response = None
         
         if method == "POST":
-            # Multipart 데이터 구성
             multi_part_data = {}
             
             if payload:
@@ -84,11 +79,9 @@ class BoardAPI:
             
             response = self.client.post(url, files=multi_part_data, headers=headers)
         else:
-            # GET 요청: None 값 필터링
             filtered_params = {k: v for k, v in (params or {}).items() if v is not None}
             response = self.client.get(url, params=filtered_params, headers=headers)
         
-        # status_code 저장
         self.client.status_code = response.status_code
 
         try:
@@ -251,13 +244,7 @@ class BoardAPI:
         }
         
         if sort:
-            # [수정] URL에서 확인한 정확한 파라미터 구조 (JSON)
-            # sort="id" 이면 오래된순(asc), sort="-id" 이면 최신순(desc)
-            # 테스트 코드에서 "id", "-id"를 보내므로 이를 API 스펙에 맞게 변환
-            
             order = "desc" if str(sort).startswith("-") else "asc"
-            
-            # JSON 문자열로 변환 (예: {"key":"created_datetime","order":"asc"})
             sort_payload = {"key": "created_datetime", "order": order}
             params["sort_by"] = json.dumps(sort_payload)
         

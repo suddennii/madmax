@@ -20,7 +20,7 @@ from utils.config import REST_BASE_URL, CLASSROOM_ID, ACCOUNT_ID, ACCOUNT_ID2
 
 
 # =========================================================
-# Helper Functions
+# 보조 함수
 # =========================================================
 
 def get_comment_info(board_api, article_id, target_comment_id, retry=5):
