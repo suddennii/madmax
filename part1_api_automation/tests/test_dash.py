@@ -67,7 +67,7 @@ def test_wrong_param(client_factory, token, params):
 
 # ------------------------------------------------------------
 # 4) No Token all (Negative)
-# 인증 토큰이 없을 때 응답 거절 확인 (url)
+# 인증 토큰이 없을 때 응답 거절 확인 (url) 
 # DASH-T04 DASH-T11 DASH-T16
 # -----------------------------------------------------------
 DATA = load_yaml("test_data/basic.yml")
