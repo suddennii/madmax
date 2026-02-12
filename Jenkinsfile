@@ -17,6 +17,17 @@ pipeline {
                     credentialsId: 'oauth2'
             }
         }
+        
+        stage('Inject env file') {
+            steps {
+                withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
+                    sh '''
+                        cp $ENV_FILE ${TEST_DIR1}/.env
+                        chmod 600 ${TEST_DIR1}/.env
+                    '''
+                }
+            }
+        }
 
         stage('Connection Check') {
             steps {
