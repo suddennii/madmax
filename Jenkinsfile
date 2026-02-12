@@ -60,7 +60,7 @@ pipeline {
                     cd ${TEST_DIR1}
                     . venv/bin/activate
                     export \$(grep -v '^#' .env | xargs)
-                    pytest -s tests/test_sub.py --html=reports/pytest_report.html --self-contained-html || true
+                    pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
                 """
             }
         }
