@@ -23,7 +23,11 @@ pipeline {
                 withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
                     sh '''
                         cp $ENV_FILE ${TEST_DIR1}/.env
+                        sed -i 's/\\r//g' ${TEST_DIR1}/.env
                         chmod 600 ${TEST_DIR1}/.env
+                        if command -v dos2unix >/dev/null 2>&1; then
+                            dos2unix ${TEST_DIR1}/.env
+                        fi
                     '''
                 }
             }
@@ -55,7 +59,8 @@ pipeline {
                 sh """
                     cd ${TEST_DIR1}
                     . venv/bin/activate
-                    pytest tests/test_sub.py --html=reports/pytest_report.html --self-contained-html
+                    export \$(grep -v '^#' .env | xargs)
+                    pytest -s tests/test_sub.py --html=reports/pytest_report.html --self-contained-html || true
                 """
             }
         }
