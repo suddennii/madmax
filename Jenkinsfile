@@ -68,17 +68,17 @@ pipeline {
             }
         }
 
-        // stage('Run Pytest (API Automation)') {
-        //     steps {
-        //         sh """
-        //             cd ${TEST_DIR1}
-        //             . venv/bin/activate
-        //             set +x
-        //             export \$(grep -v '^#' .env | xargs)
-        //             pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
-        //         """
-        //     }
-        // }
+        stage('Run Pytest (API Automation)') {
+            steps {
+                sh """
+                    cd ${TEST_DIR1}
+                    . venv/bin/activate
+                    set +x
+                    export \$(grep -v '^#' .env | xargs)
+                    pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
+                """
+            }
+        }
         stage('Run JMeter (Performance Test)') {
             steps {
                 sh """
@@ -108,7 +108,7 @@ pipeline {
     post {
         always {
             // Part 1 폴더 안에 생성된 리포트를 젠킨스 대시보드에 저장
-            // archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
+            archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
             archiveArtifacts artifacts: "${TEST_DIR2}/performance_tests/reports/**/*", allowEmptyArchive: true
             echo "✅ 모든 공정이 완료되었습니다."
         }
