@@ -111,6 +111,25 @@ pipeline {
             archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
             archiveArtifacts artifacts: "${TEST_DIR2}/performance_tests/reports/**/*", allowEmptyArchive: true
             echo "✅ 모든 공정이 완료되었습니다."
+
+            // HTML 리포트를 젠킨스 메뉴에 고정
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
+                reportFiles: 'report.html',                // 생성된 파일명
+                reportName: 'Pytest API Report'            // 젠킨스 메뉴에 표시될 이름
+            ])
+            
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'part2_api_automation/performance_tests/reports/jmeter_dashboard',
+                reportFiles: 'index.html',
+                reportName: 'JMeter Performance Report'
+            ])
         }
     }
 } // pipeline 끝
