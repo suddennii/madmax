@@ -75,9 +75,11 @@ PAGE_SKIP = int(os.getenv("PAGE_SKIP", 0))
 PAGE_COUNT = int(os.getenv("PAGE_COUNT", 20))
 TARGET_COURSE = os.getenv("TARGET_COURSE", "SANDBOX")
 SANDBOX_COURSE_ID = os.getenv("SANDBOX_COURSE_ID",768575)
-ORG_NAME = os.getenv("ORG_NAME", "qatrack")
+ORG_NAME = os.getenv("ORG_NAME", "qaproject")
+ORG_NAME2 = os.getenv("ORG_NAME2", "qatrack")
 ELICE_COURSE_ID = int(os.getenv("ELICE_COURSE_ID", 766557))
-LECTURE_ID = int(os.getenv("LECTURE_ID", 6644275))
+LECTURE_ID = int(os.getenv("LECTURE_ID", 6662952))
+LECTURE_ID2 = int(os.getenv("LECTURE_ID2", 6644275))
 ORGANIZATION_ID = os.getenv("ORGANIZATION_ID",4653)
 
 # ============================================================
@@ -96,23 +98,33 @@ SCENARIO_LOAD_TEST = [
     {
         "name": "lecture_quiz_get_before",
         "method": "POST",
-        "url": "/org/qatrack/user/lecture/test/enter/",
+        "url": "/org/qaproject/user/lecture/test/enter/",
         "params": {
-            "lecture_id": 6658973
+            "lecture_id": 6662952
+        }
+    },
+    {
+        "name": "lecture_test_start",
+        "method": "POST",
+        "url": "/org/qaproject/user/lecture/test/start/",
+        "params": {
+            "lecture_id": 6662952
         }
     },
     {
         "name": "lecture_test_stop",
         "method": "POST",
-        "url": "/org/qatrack/user/lecture/test/stop/",
-        "params": {}
+        "url": "/org/qaproject/user/lecture/test/stop/",
+        "params": {
+            "lecture_id": 6662952
+        }
     },
     {
         "name": "lecture_quiz_get_after",
         "method": "POST",
-        "url": "/org/qatrack/lecture/test/reset/by_self/",
+        "url": "/org/qaproject/lecture/test/reset/by_self/",
         "params": {
-            "lecture_id": 6658973
+            "lecture_id": 6662952
         }
     }
 ]

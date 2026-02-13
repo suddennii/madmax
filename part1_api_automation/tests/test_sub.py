@@ -14,7 +14,7 @@
 
 import pytest
 import requests
-from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS, SCENARIO_LOAD_TEST
+from utils.config import CLASSROOM_ID, PAGE_SKIP, PAGE_COUNT, TARGET_COURSE, ORG_NAME, LECTURE_ID, DEFAULT_PARAMS, SCENARIO_LOAD_TEST, ORG_NAME2, LECTURE_ID2
 from utils.auth_manager import AuthManager
 from utils.api_client import ApiClient
 from utils.logger import get_logger
@@ -53,11 +53,20 @@ def test_get_lsub02():
     client = ApiClient(token = AuthManager.get_token(), url_type="course")
     
     # 헤더에 (x-elice-org-name-short 추가)
-    client.session.headers.update({"x-elice-org-name-short": ORG_NAME})
+    client.session.headers.update({"x-elice-org-name-short": "qatrack"})
     
     try:
         # API 호출
-        response = client.get(f"/lecture_page", params=DEFAULT_PARAMS)
+        # 페이징 테스트에 필요한 값으로 변경
+        params = {
+            "filter_lecture_id": 6644275,
+            "filter_locator_type": 0,
+            "skip": 0,
+            "count": 10,
+            "elice_course_id": 766557
+        }
+
+        response = client.get("/lecture_page", params=params)
         
         assert client.status_code == 200
         assert isinstance(response, list)
@@ -68,26 +77,30 @@ def test_get_lsub02():
         assert len(response) > 0, "응답 리스트가 비어 있습니다"
         logger.info(f"LSUB-02 성공: 데이터 개수={len(response)}")
     except AssertionError as e:
-        logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-02 검증 실패 (AssertionError): {e}, params={params}")
         raise
     except TypeError as e:
-        logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-02 응답 구조 에러 (TypeError): {e}, params={params}")
         raise
     except Exception as e:
-        logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-02 API 서버 또는 시스템 에러: {e}, params={params}")
         raise
 
-# 학습과목 상세 강의 조화
+# 학습과목 상세 강의 조회
 @pytest.mark.smoke
 def test_get_lsub03():
     client = ApiClient(token = AuthManager.get_token(), url_type="course")
     
     # 헤더에 (x-elice-org-name-short 추가)
-    client.session.headers.update({"x-elice-org-name-short": ORG_NAME})
+    client.session.headers.update({"x-elice-org-name-short": ORG_NAME2})
     
     try:
         # API 호출
-        response = client.get(f"/lecture/{LECTURE_ID}", params=DEFAULT_PARAMS)
+        # 페이징 테스트에 필요한 값으로 변경
+        params = {
+            "elice_course_id": 766557
+        }
+        response = client.get(f"/lecture/{LECTURE_ID2}", params=params)
         
         assert client.status_code == 200
         assert isinstance(response, dict)
@@ -98,13 +111,13 @@ def test_get_lsub03():
         assert len(response) > 0, "응답 리스트가 비어 있습니다"
         logger.info(f"LSUB-03 성공: 데이터 개수={len(response)}")
     except AssertionError as e:
-        logger.error(f"LSUB-03 검증 실패 (AssertionError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 검증 실패 (AssertionError): {e}, params={params}")
         raise
     except TypeError as e:
-        logger.error(f"LSUB-03 응답 구조 에러 (TypeError): {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 응답 구조 에러 (TypeError): {e}, params={params}")
         raise
     except Exception as e:
-        logger.error(f"LSUB-03 API 서버 또는 시스템 에러: {e}, params={DEFAULT_PARAMS}")
+        logger.error(f"LSUB-03 API 서버 또는 시스템 에러: {e}, params={params}")
         raise
     
 
@@ -272,13 +285,13 @@ def test_get_load_test01():
     # 페이징 테스트에 필요한 값으로 변경
     params.update({
         "count": 1,
-        "filter_is_opened": True,
-        "elice_course_id": 768575
+        "skip": 0,
+        "elice_course_id": 769072
     })
     
     try:
         # API 호출
-        response = client.get(f"/lecture", params=params)
+        response = client.get(f"/lecture_page", params=params)
         
         assert client.status_code == 200
         assert isinstance(response, list)
