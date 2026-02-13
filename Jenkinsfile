@@ -9,11 +9,19 @@ pipeline {
     }
 
     stages {
+        stage('Prepare') {
+            steps {
+                // 권한 에러 방지를 위해 기존 리포트 폴더 삭제 후 재생성
+                sh "rm -rf part1_api_automation/reports part2_api_automation/performance_tests/reports"
+                sh "mkdir -p part1_api_automation/reports part2_api_automation/performance_tests/reports/jmeter_dashboard"
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
-                    branch: 'main', 
+                    branch: 'dev', 
                     credentialsId: 'oauth2'
             }
         }
@@ -23,25 +31,16 @@ pipeline {
                 // 젠킨스에 등록된 Secret File ID: 'prod-env-file'
                 withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
                     sh '''
-                        # 폴더가 없는 경우를 대비해 생성 및 권한 부여
-                        mkdir -p ${TEST_DIR1}
-                        mkdir -p ${TEST_DIR2}/performance_tests
-
-                        # 현재 폴더 및 하위 폴더 권한을 777로 일시 변경 (복사 허용)
-                        chmod -R 777 ${TEST_DIR2}/performance_tests
-
-                        # Pytest용 .env 복사
-                        cp $ENV_FILE ${TEST_DIR1}/.env
-                        sed -i 's/\\r//g' ${TEST_DIR1}/.env
+                        # 1. .env 파일 복사 (권한 에러를 피하기 위해 chmod -R 777 제거)
+                        cp ${ENV_FILE} ${TEST_DIR1}/.env
+                        cp ${ENV_FILE} ${TEST_DIR2}/performance_tests/.env
                         
-                        # JMeter 폴더로도 .env 복사 
-                        # JMeter용 .env 복사
-                        cp \$ENV_FILE ${TEST_DIR2}/performance_tests/.env
+                        # 2. 줄바꿈 기호 제거 (Windows/Linux 호환성)
+                        sed -i 's/\\r//g' ${TEST_DIR1}/.env
                         sed -i 's/\\r//g' ${TEST_DIR2}/performance_tests/.env
                         
-                        # 보안을 위해 권한 다시 제한
-                        chmod 600 ${TEST_DIR1}/.env
-                        chmod 600 ${TEST_DIR2}/performance_tests/.env
+                        # 3. 보안 권한 설정
+                        chmod 600 ${TEST_DIR1}/.env ${TEST_DIR2}/performance_tests/.env
                     '''
                 }
             }
@@ -130,6 +129,8 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'JMeter Performance Report'
             ])
+
+            echo "✅ 모든 공정이 완료되었습니다. 젠킨스 왼쪽 메뉴에서 리포트를 확인하세요!"
         }
     }
 } // pipeline 끝
