@@ -1,0 +1,149 @@
+# test_dash의 테스트 데이터 파일
+
+params:
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: 5
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: 10
+    expected:
+      items: 10
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 9999
+    count: 10
+    expected:
+      items: 0
+
+  - account_id: "000000"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: 5
+    expected:
+      items: 0
+
+no_params:
+  - account_id: "8861406"
+    offset: 0
+    count: 5
+    expected: 
+      code: 422
+      type : "missing"
+
+wrong_params:
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: -1
+    expected: 
+      code: 422
+      type : "greater_than_equal"
+
+  - account_id: "8861406"
+    classroom_id: "1234"
+    offset: 0
+    count: 5
+    expected: 
+      code: 422
+      type : "uuid_parsing"
+  
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    count: 5
+    expected: 
+      code: 422
+      type : "missing"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: -1
+    count: 5
+    expected: 
+      code: 422
+      type : "greater_than_equal"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    expected: 
+      code: 422
+      type : "missing"
+
+  - account_id: "8861406"
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    offset: 0
+    count: 0
+    expected: 
+      code: 422
+      type : "greater_than_equal"
+
+account_no_token:
+  - account_id: 8861406
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861406
+      code: 403
+      type : "no_access_token"
+
+classroom_params :
+  - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    filter_title: "%25%25"
+    skip: 0
+    count: 5
+    expected:
+      code: 200
+      items: 40
+
+classroom_params_positive :
+  - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    filter_title: "%25%25"
+    skip: 0
+    count: 40
+    expected:
+      code: 200
+      items: 40
+
+  - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    filter_title: 0
+    skip: 9999
+    count: 40
+    expected:
+      code: 200
+      items: 0
+
+classroom_params_negative :
+  - classroom_id: "1234"
+    filter_title: 0
+    skip: 0
+    count: 40
+    expected:
+      code: 422
+      type : "uuid_parsing"
+
+  - classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    filter_title: 0
+    skip: 0
+    count: -1
+    expected:
+      code: 422
+      type : "greater_than_equal"
+
+account :
+  - account_id: 8861406
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861406
+
+account_negative:
+  - account_id: 8861863
+    classroom_id: "a6bd98a3-83ff-4e5d-ba9e-6c04c69592fc"
+    expected: 
+      id: 8861863
+      code: 403
+      type : "no_access_token"
+

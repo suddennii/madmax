@@ -13,21 +13,25 @@ pipeline {
             steps {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
-                    branch: 'main', 
+                    branch: 'dev', 
                     credentialsId: 'oauth2'
             }
         }
         
         stage('Inject env file') {
             steps {
+                // 젠킨스에 등록된 Secret File ID: 'prod-env-file'
                 withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
                     sh '''
+                        # Pytest용 .env 복사
                         cp $ENV_FILE ${TEST_DIR1}/.env
                         sed -i 's/\\r//g' ${TEST_DIR1}/.env
                         chmod 600 ${TEST_DIR1}/.env
                         if command -v dos2unix >/dev/null 2>&1; then
                             dos2unix ${TEST_DIR1}/.env
                         fi
+                        # JMeter 폴더로도 .env 복사 (토큰 추출 용도)
+                        cp \$ENV_FILE ${TEST_DIR2}/performance_tests/.env
                     '''
                 }
             }
@@ -42,7 +46,7 @@ pipeline {
         }
 
         
-        stage('Environment Setup') {
+        stage('Environment Setup (Pytest)') {
             steps {
                 sh """
                     cd ${TEST_DIR1}
@@ -65,24 +69,31 @@ pipeline {
                 """
             }
         }
-        /* 나중에 코드가 준비되면 아래 stage들의 주석을 해제하세요. 
         stage('Run JMeter (Performance Test)') {
             steps {
                 sh """
                     cd ${TEST_DIR2}/performance_tests
+
+                    # 1. .env 파일에서 토큰 값 추출 (변수명이 TOKEN이라고 가정)
+                    # 실제 .env 내 변수명에 맞게 'TOKEN' 부분을 수정하세요.
+                    ACCESS_TOKEN=\$(grep 'TOKEN' .env | cut -d '=' -f2 | tr -d '\\r')
+
+                    # 2. 리포트 폴더 초기화
                     rm -rf reports
                     mkdir -p reports/jmeter_dashboard
-                    ${JMETER_BIN} -n -t load_test2.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
+
+                    # 3. JMeter 실행
+                    ${JMETER_BIN} -n -t 3team_load_test_v4.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
                 """
             }
         }
-        */
     } // stages 끝
 
     post {
         always {
             // Part 1 폴더 안에 생성된 리포트를 젠킨스 대시보드에 저장
             archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
+            archiveArtifacts artifacts: "${TEST_DIR2}/performance_tests/reports/**/*", allowEmptyArchive: true
             echo "✅ 모든 공정이 완료되었습니다."
         }
     }
