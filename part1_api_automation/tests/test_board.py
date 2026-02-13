@@ -1,19 +1,8 @@
 """
-게시판(Board) API 테스트 - TC 기반 통합 시나리오
-
-작성자: 심다영 / 작성일: 2026-02-05
-수정자: 심다영 / 수정일: 2026-02-11
-
-[테스트 범위]
-- Positive: BOARD_01~20 (시나리오, 정렬)
-- Negative: BOARD_12, BOARD_21~28 (필수값, 보안, 권한)
-- Security: 타인 계정 사칭(Impersonation) 추가
-
 게시판(Board) API 테스트
 
 작성자: 심다영
 작성일: 2026-02-13
-코드 리팩토링
 """
 
 import pytest
@@ -191,9 +180,9 @@ def test_board_28_create_empty_comment(board_api):
         board_api.delete_article(article_id)
 
 #--------------------------------------------------------------------
-# SEC_003 타인 글 수정 방어 - Security
+# BOARD_31 타인 게시글 수정 권한 검증 - Security
 #--------------------------------------------------------------------
-def test_sec_003_modify_other_user_article(board_api):
+def test_board_31_modify_other_user_article(board_api):
     target = find_other_user_article(board_api)
     if target is None:
         pytest.skip("타인 게시글을 찾지 못함")
@@ -215,14 +204,14 @@ def test_sec_003_modify_other_user_article(board_api):
         pytest.fail(f"🚨 보안 취약점: 타인({target_author})의 게시글이 수정됨!")
 
 #--------------------------------------------------------------------
-# SEC_004 XSS 방어 - Security
+# BOARD_32 XSS 스크립트 삽입 방어 - Security
 #--------------------------------------------------------------------
 @pytest.mark.parametrize("xss_payload", [
     "<script>alert('XSS')</script>",
     "<img src=x onerror=alert('XSS')>",
     "<svg onload=alert('XSS')>",
 ])
-def test_sec_004_xss_prevention(board_api, xss_payload):
+def test_board_32_xss_prevention(board_api, xss_payload):
     article_id = None
     try:
         res = board_api.create_article(f"[XSS] {xss_payload}", f"본문: {xss_payload}", is_secret=False)
@@ -243,9 +232,9 @@ def test_sec_004_xss_prevention(board_api, xss_payload):
             board_api.delete_article(article_id)
 
 #--------------------------------------------------------------------
-# FILE_001 이미지 파일 업로드
+# BOARD_33 이미지 파일 업로드 테스트
 #--------------------------------------------------------------------
-def test_file_001_image_upload(board_api):
+def test_board_33_image_upload(board_api):
     # 임시 이미지 파일 생성 (1x1 JPEG)
     jpeg_bytes = bytes([
         0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
@@ -269,7 +258,7 @@ def test_file_001_image_upload(board_api):
         
         with open(filepath, 'rb') as f:
             files = {'file': ('test.jpg', f, 'image/jpeg')}
-            res = board_api.create_article("[FILE_001] 이미지 업로드", "이미지 첨부", is_secret=False, files=files)
+            res = board_api.create_article("[BOARD_33] 이미지 업로드", "이미지 첨부", is_secret=False, files=files)
         
         article_id = res.get("board_article_id")
         if article_id:
@@ -284,13 +273,13 @@ def test_file_001_image_upload(board_api):
             board_api.delete_article(article_id)
 
 #--------------------------------------------------------------------
-# FILE_002 실행 파일 업로드 차단 - Security
+# BOARD_34 실행 파일 업로드 제한 - Security
 #--------------------------------------------------------------------
 @pytest.mark.parametrize("extension,content", [
     (".exe", b"MZ\x90\x00"),
     (".sh", b"#!/bin/bash\necho test"),
 ])
-def test_file_002_block_executable(board_api, extension, content):
+def test_board_34_block_executable(board_api, extension, content):
     fd, filepath = tempfile.mkstemp(suffix=extension)
     article_id = None
     
@@ -300,7 +289,7 @@ def test_file_002_block_executable(board_api, extension, content):
         
         with open(filepath, 'rb') as f:
             files = {'file': (f'malicious{extension}', f, 'application/octet-stream')}
-            res = board_api.create_article(f"[FILE_002] 실행 파일 ({extension})", "실행 파일 시도", is_secret=False, files=files)
+            res = board_api.create_article(f"[BOARD_34] 실행 파일 ({extension})", "실행 파일 시도", is_secret=False, files=files)
         
         article_id = res.get("board_article_id")
         
@@ -316,10 +305,10 @@ def test_file_002_block_executable(board_api, extension, content):
             board_api.delete_article(article_id)
 
 #--------------------------------------------------------------------
-# BIZ_001 조회수 증가
+# BOARD_35 게시글 조회수 증가 로직
 #--------------------------------------------------------------------
-def test_biz_001_view_count(board_api):
-    res = board_api.create_article("[BIZ_001] 조회수 테스트", "조회수 테스트", is_secret=False)
+def test_board_35_view_count(board_api):
+    res = board_api.create_article("[BOARD_35] 조회수 테스트", "조회수 테스트", is_secret=False)
     article_id = res.get("board_article_id")
     
     try:
@@ -338,10 +327,10 @@ def test_biz_001_view_count(board_api):
         board_api.delete_article(article_id)
 
 #--------------------------------------------------------------------
-# BIZ_002 삭제된 글 접근
+# BOARD_36 삭제된 게시글 접근 차단
 #--------------------------------------------------------------------
-def test_biz_002_access_deleted_article(board_api):
-    res = board_api.create_article("[BIZ_002] 삭제 테스트", "곧 삭제됨", is_secret=False)
+def test_board_36_access_deleted_article(board_api):
+    res = board_api.create_article("[BOARD_36] 삭제 테스트", "곧 삭제됨", is_secret=False)
     article_id = res.get("board_article_id")
     
     board_api.delete_article(article_id)
@@ -355,11 +344,11 @@ def test_biz_002_access_deleted_article(board_api):
             pytest.fail("🚨 삭제된 게시글에 접근 가능!")
 
 #--------------------------------------------------------------------
-# VAL_001 제목 길이 제한
+# BOARD_37 제목 최대 길이 제한
 #--------------------------------------------------------------------
-@pytest.mark.parametrize("title_length", [1000, 2000, 5000])
-def test_val_001_title_length(board_api, title_length):
-    long_title = "[VAL] " + "가" * title_length
+@pytest.mark.parametrize("title_length", [255, 500, 1000])
+def test_board_37_title_length(board_api, title_length):
+    long_title = "[BOARD_37] " + "가" * title_length
     article_id = None
     
     try:
