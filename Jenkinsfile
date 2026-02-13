@@ -13,7 +13,7 @@ pipeline {
             steps {
                 // GitLab 주소 및 인증정보 설정
                 git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
-                    branch: 'dev', 
+                    branch: 'TC2', 
                     credentialsId: 'oauth2'
             }
         }
@@ -83,8 +83,13 @@ pipeline {
                     mkdir -p reports/jmeter_dashboard
 
                     # 3. JMeter 실행
-                    ${JMETER_BIN} -n -t 3team_load_test_v4.jmx -l reports/result.jtl -e -o reports/jmeter_dashboard || true
-                """
+                    ${JMETER_BIN} -n -t 3team_load_test_v4.jmx \
+                    -Jtoken=\$ACCESS_TOKEN \
+                    -l reports/result.jtl
+                    
+                    # 4. 실행 후 별도로 대시보드 생성 시도
+                    ${JMETER_BIN} -g reports/result.jtl -o reports/jmeter_dashboard || echo "Dashboard generation failed"
+                    """
             }
         }
     } // stages 끝
