@@ -30,7 +30,7 @@ pipeline {
             steps {
                 // 젠킨스에 등록된 Secret File ID: 'prod-env-file'
                 withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
-                    sh '''
+                    sh """
                         # 1. .env 파일 복사 (권한 에러를 피하기 위해 chmod -R 777 제거)
                         cp ${ENV_FILE} ${TEST_DIR1}/.env
                         cp ${ENV_FILE} ${TEST_DIR2}/performance_tests/.env
@@ -41,7 +41,7 @@ pipeline {
                         
                         # 3. 보안 권한 설정
                         chmod 600 ${TEST_DIR1}/.env ${TEST_DIR2}/performance_tests/.env
-                    '''
+                    """
                 }
             }
         }
@@ -72,9 +72,8 @@ pipeline {
                 sh """
                     cd ${TEST_DIR1}
                     . venv/bin/activate
-                    set +x
-                    export \$(grep -v '^#' .env | xargs)
-                    pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
+                    set -a; source .env; set +a
+                    pytest -s tests/ --html=reports/index.html --self-contained-html || true
                 """
             }
         }
@@ -117,7 +116,7 @@ pipeline {
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
-                reportFiles: 'report.html',                // 생성된 파일명
+                reportFiles: 'index.html',                // 생성된 파일명
                 reportName: 'Pytest API Report'            // 젠킨스 메뉴에 표시될 이름
             ])
             
