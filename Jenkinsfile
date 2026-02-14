@@ -30,7 +30,7 @@ pipeline {
             steps {
                 // 젠킨스에 등록된 Secret File ID: 'prod-env-file'
                 withCredentials([file(credentialsId: 'prod-env-file', variable: 'ENV_FILE')]) {
-                    sh """
+                    sh '''
                         # 1. .env 파일 복사 (권한 에러를 피하기 위해 chmod -R 777 제거)
                         cp ${ENV_FILE} ${TEST_DIR1}/.env
                         cp ${ENV_FILE} ${TEST_DIR2}/performance_tests/.env
@@ -41,7 +41,7 @@ pipeline {
                         
                         # 3. 보안 권한 설정
                         chmod 600 ${TEST_DIR1}/.env ${TEST_DIR2}/performance_tests/.env
-                    """
+                    '''
                 }
             }
         }
@@ -71,14 +71,10 @@ pipeline {
             steps {
                 sh """
                     cd ${TEST_DIR1}
-                    python3 -m venv venv
                     . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    
-                    # source 대신 . 을 사용하여 환경변수 로드
-                    set -a; . ./.env; set +a
-                    pytest -s tests/ --html=reports/index.html --self-contained-html --css=tests/style.css || true
+                    set +x
+                    export \$(grep -v '^#' .env | xargs)
+                    pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
                 """
             }
         }
@@ -121,8 +117,8 @@ pipeline {
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
-                reportFiles: 'index.html',                // 생성된 파일명
-                reportName: 'Pytest-API-Report'            // 젠킨스 메뉴에 표시될 이름
+                reportFiles: 'pytest_report.html',                // 생성된 파일명
+                reportName: 'Pytest API Report'            // 젠킨스 메뉴에 표시될 이름
             ])
             
             publishHTML([
@@ -131,7 +127,7 @@ pipeline {
                 keepAll: true,
                 reportDir: 'part2_api_automation/performance_tests/reports/jmeter_dashboard',
                 reportFiles: 'index.html',
-                reportName: 'JMeter-Performance-Report'
+                reportName: 'JMeter Performance Report'
             ])
 
             echo "✅ 모든 공정이 완료되었습니다. 젠킨스 왼쪽 메뉴에서 리포트를 확인하세요!"
