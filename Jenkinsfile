@@ -62,6 +62,7 @@ pipeline {
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
+                    pip install pytest-html==3.2.0
                     pip install -r requirements.txt
                 """
             }
