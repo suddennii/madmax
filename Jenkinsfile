@@ -78,7 +78,7 @@ pipeline {
                     
                     # source 대신 . 을 사용하여 환경변수 로드
                     set -a; . ./.env; set +a
-                    pytest -s tests/ --html=reports/index.html --self-contained-html || true
+                    pytest -s tests/ --html=reports/index.html --self-contained-html --css=tests/style.css || true
                 """
             }
         }
