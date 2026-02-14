@@ -71,8 +71,13 @@ pipeline {
             steps {
                 sh """
                     cd ${TEST_DIR1}
+                    python3 -m venv venv
                     . venv/bin/activate
-                    set -a; source .env; set +a
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    
+                    # source 대신 . 을 사용하여 환경변수 로드
+                    set -a; . ./.env; set +a
                     pytest -s tests/ --html=reports/index.html --self-contained-html || true
                 """
             }
@@ -114,7 +119,7 @@ pipeline {
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
-                keepAll: false,
+                keepAll: true,
                 reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
                 reportFiles: 'index.html',                // 생성된 파일명
                 reportName: 'Pytest-API-Report'            // 젠킨스 메뉴에 표시될 이름
@@ -123,7 +128,7 @@ pipeline {
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
-                keepAll: false,
+                keepAll: true,
                 reportDir: 'part2_api_automation/performance_tests/reports/jmeter_dashboard',
                 reportFiles: 'index.html',
                 reportName: 'JMeter-Performance-Report'
