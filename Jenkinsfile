@@ -114,7 +114,7 @@ pipeline {
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
-                keepAll: true,
+                keepAll: false,
                 reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
                 reportFiles: 'index.html',                // 생성된 파일명
                 reportName: 'Pytest-API-Report'            // 젠킨스 메뉴에 표시될 이름
@@ -123,7 +123,7 @@ pipeline {
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
-                keepAll: true,
+                keepAll: false,
                 reportDir: 'part2_api_automation/performance_tests/reports/jmeter_dashboard',
                 reportFiles: 'index.html',
                 reportName: 'JMeter-Performance-Report'
