@@ -62,7 +62,6 @@ pipeline {
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
-                    pip install pytest-html==3.2.0
                     pip install -r requirements.txt
                 """
             }
@@ -108,7 +107,7 @@ pipeline {
     post {
         always {
             // Part 1 폴더 안에 생성된 리포트를 젠킨스 대시보드에 저장
-            archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true
+            archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true, fingerprint: true
             archiveArtifacts artifacts: "${TEST_DIR2}/performance_tests/reports/**/*", allowEmptyArchive: true
             echo "✅ 모든 공정이 완료되었습니다."
 
