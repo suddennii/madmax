@@ -107,6 +107,7 @@ pipeline {
 
     post {
         always {
+            junit "**/reports/result.xml"
             // Part 1 폴더 안에 생성된 리포트를 젠킨스 대시보드에 저장
             // archiveArtifacts artifacts: "${TEST_DIR1}/reports/*.html", allowEmptyArchive: true, fingerprint: true
             archiveArtifacts artifacts: "${TEST_DIR1}/reports/**/*", allowEmptyArchive: true
