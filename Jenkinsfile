@@ -74,7 +74,7 @@ pipeline {
                     . venv/bin/activate
                     set +x
                     export \$(grep -v '^#' .env | xargs)
-                    pytest -s tests/ --html=reports/pytest_report.html --self-contained-html || true
+                    pytest -s tests/ --html=reports/pytest_report.html || true
                 """
             }
         }
@@ -112,14 +112,14 @@ pipeline {
             echo "✅ 모든 공정이 완료되었습니다."
 
             // HTML 리포트를 젠킨스 메뉴에 고정
-            // publishHTML([
-            //     allowMissing: false,
-            //     alwaysLinkToLastBuild: true,
-            //     keepAll: true,
-            //     reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
-            //     reportFiles: 'pytest_report.html',                // 생성된 파일명
-            //     reportName: 'Pytest API Report'            // 젠킨스 메뉴에 표시될 이름
-            // ])
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'part1_api_automation/reports', // 리포트가 저장된 폴더 경로
+                reportFiles: 'pytest_report.html',                // 생성된 파일명
+                reportName: 'Pytest API Report'            // 젠킨스 메뉴에 표시될 이름
+            ])
             
             publishHTML([
                 allowMissing: false,
