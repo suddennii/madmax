@@ -96,7 +96,7 @@ pipeline {
                     mkdir -p reports/jmeter_dashboard
 
                     # [추가] dstat 백그라운드 실행: 1초 간격으로 자원 수집 후 CSV 저장 (모니터링)
-                    dstat -tcndym --output reports/system_resource_usage.csv 1 > /dev/null & 
+                    nohup dstat -tcmnd --output reports/system_resource_usage_raw.csv 1 > /dev/null 2>&1 &
                     MON_PID=\$!
 
                     # 3. JMeter 실행 (최신 버전용 옵션)
@@ -110,7 +110,11 @@ pipeline {
                         -e -o reports/jmeter_dashboard
 
                     # 4. 테스트 종료 후 모니터링 프로세스 종료
+                    sleep 2
                     kill \$MON_PID || true
+
+                    # 5. [중요] dstat CSV 상단의 메타데이터(6줄)를 제거해야 Plot 플러그인이 읽을 수 있음.
+                    tail -n +7 reports/system_resource_usage_raw.csv > reports/system_resource_usage.csv
                     """
             }
         }
