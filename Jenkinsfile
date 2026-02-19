@@ -95,6 +95,10 @@ pipeline {
                     rm -rf reports
                     mkdir -p reports/jmeter_dashboard
 
+                    # [추가] dstat 백그라운드 실행: 1초 간격으로 자원 수집 후 CSV 저장 (모니터링)
+                    dstat -tcndym --output reports/system_resource_usage.csv 1 > /dev/null & 
+                    MON_PID=\$!
+
                     # 3. JMeter 실행 (최신 버전용 옵션)
                     # -n: Non-GUI 모드
                     # -t: 테스트 계획 파일(.jmx)
@@ -104,6 +108,9 @@ pipeline {
                         "-Jtoken=\$ACCESS_TOKEN" \\
                         -l reports/result.jtl \\
                         -e -o reports/jmeter_dashboard
+
+                    # 4. 테스트 종료 후 모니터링 프로세스 종료
+                    kill \$MON_PID || true
                     """
             }
         }
@@ -115,7 +122,15 @@ pipeline {
             allure includeProperties: false, results: [[path: "${TEST_DIR1}/allure-results"]]
             archiveArtifacts artifacts: "${TEST_DIR2}/performance_tests/reports/**/*", allowEmptyArchive: true
             
-            echo "✅ 모든 공정이 완료되었습니다."
+            // 2. CSV 데이터 기반 젠킨스 대시보드 그래프 생성 (Plot Plugin)
+            plot csvFileName: 'plot-resource.csv', 
+                 group: 'Resource Usage', 
+                 title: 'System Performance (CPU/System)', 
+                 style: 'line', 
+                 csvSeries: [[
+                     file: "${TEST_DIR2}/performance_tests/reports/system_resource_usage.csv", 
+                     displayTableFlag: true
+                 ]]
             
             publishHTML([
                 allowMissing: false,
