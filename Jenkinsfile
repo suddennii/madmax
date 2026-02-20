@@ -88,7 +88,7 @@ pipeline {
             steps {
                 script{
                     // 테스트할 사용자 수 
-                    def threadCnt = [1, 3, 5, 8, 10]
+                    def threadCnt = [10, 30, 50, 70, 100]
 
                     for (threads in threadCnt){
                         echo "##### 현재 테스트 사용자 수 : ${threads}"
@@ -150,7 +150,7 @@ pipeline {
                  title: 'System Performance (100 Threads)', 
                  style: 'line', 
                  csvSeries: [[
-                     file: "${TEST_DIR2}/performance_tests/reports/threads_10/system_resource_usage.csv", 
+                     file: "${TEST_DIR2}/performance_tests/reports/threads_100/system_resource_usage.csv", 
                      displayTableFlag: true
                  ]]
             
@@ -158,7 +158,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'part2_api_automation/performance_tests/reports/threads_10/dashboard',
+                reportDir: 'part2_api_automation/performance_tests/reports/threads_100/dashboard',
                 reportFiles: 'index.html',
                 reportName: 'JMeter Performance Report (Final)'
             ])
