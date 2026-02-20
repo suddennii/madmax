@@ -353,13 +353,13 @@
         <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Error Response Logger">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
-            def responseCode = prev.getResponseCode();
+            def responseBody = prev.getResponseDataAsString();
             if (responseBody.contains(&quot;409&quot;)) {
-                log.error(&quot;!!!!!!!!!! INTERNAL 409 ERROR DETECTED !!!!!!!!!!&quot;);
-                log.error(&quot;Sampler: &quot; + prev.getSampleLabel());
-                log.error(&quot;Response Code (HTTP): &quot; + prev.getResponseCode()); // 이건 아마 200일 겁니다.
-                log.error(&quot;Actual Response Body: &quot; + responseBody);
-                log.error(&quot;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!&quot;);
+                log.info(&quot;!!!!!!!!!! INTERNAL 409 ERROR DETECTED !!!!!!!!!!&quot;);
+                log.info(&quot;Sampler: &quot; + prev.getSampleLabel());
+                log.info(&quot;Response Code (HTTP): &quot; + prev.getResponseCode()); // 이건 아마 200일 겁니다.
+                log.info(&quot;Actual Response Body: &quot; + responseBody);
+                log.info(&quot;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!&quot;);
             }
           </stringProp>
           <stringProp name="parameters"></stringProp>
