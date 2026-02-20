@@ -115,9 +115,11 @@ pipeline {
                             jmeter -n -t 3team_load_test_v4.jmx \\
                                 "-Jtoken=\$ACCESS_TOKEN" \\
                                 "-Jthreads=${threads}" \\
-                                "-Jjmeter.save.saveservice.response_data=true" \\
-                                "-Jjmeter.save.saveservice.samplerData=true" \\
-                                "-Jjmeter.save.saveservice.responseCode=true" \\
+                                "-Djmeter.save.saveservice.output_format=xml" \\
+                                "-Djmeter.save.saveservice.response_data=true" \\
+                                "-Djmeter.save.saveservice.samplerData=true" \\
+                                "-Djmeter.save.saveservice.responseCode=true" \\
+                                "-Djmeter.save.saveservice.response_message=true" \\
                                 -l \$REPORT_PATH/result.jtl \\
                                 -j \$REPORT_PATH/jmeter.log \\
                                 -e -o \$REPORT_PATH/dashboard
