@@ -115,6 +115,9 @@ pipeline {
                             jmeter -n -t 3team_load_test_v4.jmx \\
                                 "-Jtoken=\$ACCESS_TOKEN" \\
                                 "-Jthreads=${threads}" \\
+                                "-Jjmeter.save.saveservice.response_data=true" \\      // 응답 바디 저장 활성화
+                                "-Jjmeter.save.saveservice.samplerData=true" \\        // 요청 데이터 저장 활성화
+                                "-Jjmeter.save.saveservice.responseCode=true" \\       // 응답 코드 저장 확인
                                 -l \$REPORT_PATH/result.jtl \\
                                 -j \$REPORT_PATH/jmeter.log \\
                                 -e -o \$REPORT_PATH/dashboard
