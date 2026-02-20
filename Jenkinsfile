@@ -155,7 +155,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'part2_api_automation/performance_tests/reports/threads_10/jmeter_dashboard',
+                reportDir: 'part2_api_automation/performance_tests/reports/threads_10/dashboard',
                 reportFiles: 'index.html',
                 reportName: 'JMeter Performance Report (Final)'
             ])
