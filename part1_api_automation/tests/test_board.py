@@ -31,6 +31,29 @@ def find_other_user_article(board_api):
             return {"id": article.get("id"), "author": author, "title": article.get("title")}
     return None
 
+def get_comment_info(board_api, article_id, comment_id, retry=3):
+    """댓글 목록에서 특정 댓글을 찾아 반환"""
+    target_str = str(comment_id)
+    
+    for _ in range(retry):
+        time.sleep(0.5)
+        res = board_api.get_comments(article_id, count=40)
+        
+        # 응답 파싱
+        if isinstance(res, list):
+            comments = res
+        elif isinstance(res, dict):
+            comments = res.get("article_comments") or res.get("comments") or []
+        else:
+            comments = []
+        
+        for item in comments:
+            c_id = item.get("id") or item.get("article_comment_id")
+            if str(c_id) == target_str:
+                return item
+    
+    return None
+
 #--------------------------------------------------------------------
 # BOARD_01 게시글 목록 조회
 #--------------------------------------------------------------------
@@ -64,6 +87,147 @@ def test_board_04_search_no_result(board_api):
     res = board_api.get_list(skip=0, count=10, filter_title="%zzznotexist999%")
     articles = res if isinstance(res, list) else []
     assert len(articles) == 0
+
+#--------------------------------------------------------------------
+# [Fixture] 테스트용 임시 게시글 (자동 생성/삭제)
+#--------------------------------------------------------------------
+@pytest.fixture
+def temp_article(board_api):
+    """테스트용 임시 게시글 생성 → 테스트 후 자동 삭제"""
+    res = board_api.create_article("[Auto] 통합 테스트용", "통합 테스트 게시글", is_secret=False)
+    article_id = res.get("board_article_id")
+    
+    assert article_id is not None, f"임시 게시글 생성 실패: {res}"
+    
+    yield article_id
+    
+    board_api.delete_article(article_id)
+
+#--------------------------------------------------------------------
+# [통합] 게시판 전체 기능 시나리오 테스트 (생성 → 조회 → 수정 → 좋아요 → 댓글 → 삭제)
+#--------------------------------------------------------------------
+def test_scenario_flow(board_api, temp_article):
+    """
+    [시나리오] 게시판 전체 기능 통합 테스트
+    생성(Fixture) → 조회 → 수정 → 좋아요 → 목록/검색 → 댓글 → 삭제(Fixture)
+    """
+    article_id = temp_article
+
+    # Step 1: 게시글 조회 및 검증
+    time.sleep(0.5)
+    created_info = board_api.get_article(article_id)
+    
+    assert created_info is not None, f"게시글 조회 실패: ID={article_id}"
+    assert created_info.get("title") == "[Auto] 통합 테스트용", "제목 불일치"
+
+    # Step 2: 게시글 수정
+    board_api.update_article(article_id, "[Auto] 수정된 제목", "수정된 본문", is_secret=False)
+    assert board_api.status_code == 200, f"수정 실패: HTTP {board_api.status_code}"
+    
+    time.sleep(0.5)
+    updated_info = board_api.get_article(article_id)
+    assert updated_info is not None, "수정 후 조회 실패"
+    assert updated_info.get("title") == "[Auto] 수정된 제목", "제목 수정 실패"
+
+    # Step 3: 게시글 좋아요
+    likes_before = updated_info.get("like_count", 0) if updated_info else 0
+    
+    board_api.like_article(article_id, is_add=True)
+    assert board_api.status_code == 200, "좋아요 추가 실패"
+    
+    time.sleep(0.5)
+    info_after_like = board_api.get_article(article_id)
+    likes_after = info_after_like.get("like_count", 0) if info_after_like else 0
+    assert likes_after == likes_before + 1, "좋아요 갯수 증가 실패"
+    
+    board_api.like_article(article_id, is_add=False)
+    assert board_api.status_code == 200, "좋아요 취소 실패"
+
+    # Step 4: 댓글 CRUD
+    resp_cmt = board_api.create_comment(article_id, "[Auto] 댓글 테스트")
+    comment_id = resp_cmt.get("article_comment_id")
+    assert comment_id is not None, f"댓글 생성 실패: {resp_cmt}"
+    
+    time.sleep(0.5)
+    cmt_info = get_comment_info(board_api, article_id, comment_id)
+    assert cmt_info is not None, "생성된 댓글 조회 실패"
+    assert cmt_info.get("content") == "[Auto] 댓글 테스트", "댓글 내용 불일치"
+    
+    # 댓글 수정
+    board_api.update_comment(comment_id, article_id, "[Auto] 수정된 댓글")
+    assert board_api.status_code == 200, "댓글 수정 실패"
+    
+    # 댓글 좋아요
+    cmt_before = get_comment_info(board_api, article_id, comment_id)
+    cmt_likes_before = cmt_before.get("comment_like_count", 0) if cmt_before else 0
+    
+    board_api.like_comment(comment_id, is_add=True)
+    assert board_api.status_code == 200, "댓글 좋아요 추가 실패"
+    
+    time.sleep(0.5)
+    cmt_after = get_comment_info(board_api, article_id, comment_id)
+    cmt_likes_after = cmt_after.get("comment_like_count", 0) if cmt_after else 0
+    assert cmt_likes_after == cmt_likes_before + 1, "댓글 좋아요 카운트 증가 안됨"
+    
+    board_api.like_comment(comment_id, is_add=False)
+    assert board_api.status_code == 200, "댓글 좋아요 취소 실패"
+    
+    # 댓글 삭제
+    board_api.delete_comment(comment_id, article_id)
+    assert board_api.status_code == 200, "댓글 삭제 실패"
+    
+    time.sleep(0.5)
+    deleted_cmt = get_comment_info(board_api, article_id, comment_id)
+    assert deleted_cmt is None, "댓글이 실제 삭제되지 않음"
+
+#--------------------------------------------------------------------
+# [통합] 댓글 정렬 테스트 (BOARD_17, BOARD_18)
+#--------------------------------------------------------------------
+def test_comment_sorting(board_api, temp_article):
+    """[TC] 댓글 정렬(오래된순/최신순) 검증"""
+    article_id = temp_article
+    created_ids = []
+    
+    try:
+        # 댓글 3개 순차적 생성
+        for i in range(1, 4):
+            resp = board_api.create_comment(article_id, f"[Sort] 댓글 {i}")
+            c_id = resp.get("article_comment_id")
+            if c_id:
+                created_ids.append(str(c_id))
+            time.sleep(0.5)
+
+        assert len(created_ids) == 3, "필수 댓글 3개 생성 실패"
+        time.sleep(1)
+
+        def _get_server_ids(sort_param):
+            """API를 호출하여 댓글 ID 리스트 추출"""
+            res = board_api.get_comments(article_id, count=40, sort=sort_param)
+            if isinstance(res, list):
+                comments = res
+            elif isinstance(res, dict):
+                comments = res.get("article_comments") or []
+            else:
+                comments = []
+            return [str(c.get("id") or c.get("article_comment_id")) for c in comments]
+
+        # 오래된 순 검증
+        server_ids_asc = _get_server_ids("id")
+        indices_asc = [server_ids_asc.index(cid) for cid in created_ids if cid in server_ids_asc]
+        
+        if len(indices_asc) == 3:
+            assert indices_asc == sorted(indices_asc), "오래된순 정렬 순서 불일치"
+
+        # 최신 순 검증
+        server_ids_desc = _get_server_ids("-id")
+        indices_desc = [server_ids_desc.index(cid) for cid in created_ids if cid in server_ids_desc]
+        
+        if len(indices_desc) == 3:
+            assert indices_desc == sorted(indices_desc, reverse=True), "최신순 정렬 순서 불일치"
+
+    finally:
+        # 댓글 정리 (fixture가 게시글 삭제 시 같이 삭제됨)
+        pass
 
 #--------------------------------------------------------------------
 # BOARD_11 게시글 생성
