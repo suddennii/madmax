@@ -88,7 +88,7 @@ pipeline {
             steps {
                 script{
                     // 테스트할 사용자 수 
-                    def threadCnt = [10, 30, 50, 70, 100]
+                    def threadCnt = [1, 3]
 
                     for (threads in threadCnt){
                         echo "##### 현재 테스트 사용자 수 : ${threads}"
