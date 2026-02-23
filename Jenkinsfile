@@ -150,7 +150,7 @@ pipeline {
                  title: 'System Performance (100 Threads)', 
                  style: 'line', 
                  csvSeries: [[
-                     file: "${TEST_DIR2}/performance_tests/reports/threads_100/system_resource_usage.csv", 
+                     file: "${TEST_DIR2}/performance_tests/reports/threads_1/system_resource_usage.csv", 
                      displayTableFlag: true
                  ]]
             
@@ -158,7 +158,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'part2_api_automation/performance_tests/reports/threads_100/dashboard',
+                reportDir: 'part2_api_automation/performance_tests/reports/threads_1/dashboard',
                 reportFiles: 'index.html',
                 reportName: 'JMeter Performance Report (Final)'
             ])
