@@ -12,9 +12,9 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // GitLab 주소 및 인증정보 설정
-                git url: 'https://github.com/suddennii/madmax.git', 
-                    branch: 'TC1', 
-                    credentialsId: 'github-madmax'
+                git url: 'https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git', 
+                    branch: 'main', 
+                    credentialsId: 'oauth2'
             }
         }
 
