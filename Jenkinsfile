@@ -97,7 +97,8 @@ pipeline {
                             cd ${TEST_DIR2}/performance_tests
 
                             # 1. TOKEN 추출
-                            ACCESS_TOKEN=\$(grep '^TOKEN=' .env | cut -d '=' -f2- | head -n 1 | tr -d '\\r' | tr -d '\\n')
+                            # .env 전체를 환경 변수로 export
+                            export \$(grep -v '^#' .env | xargs)
 
                             # 2. 결과 폴더 초기화
                             REPORT_PATH="reports/threads_${threads}"
