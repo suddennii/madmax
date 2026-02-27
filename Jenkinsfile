@@ -114,7 +114,6 @@ pipeline {
                             # -l: 결과 파일(.jtl) 저장
                             # -e -o: 실행 직후 HTML 대시보드 생성
                             jmeter -n -t 3team_load_test_v4.jmx \\
-                                "-Jtoken=\$ACCESS_TOKEN" \\
                                 "-Jthreads=${threads}" \\
                                 "-Jjmeter.save.saveservice.response_data=true" \\
                                 "-Jjmeter.save.saveservice.samplerData=true" \\
