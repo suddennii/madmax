@@ -1,4 +1,4 @@
-# 🚀 LXP QA 자동화 & 부하 테스트 프로젝트
+#  LXP QA 자동화 & 부하 테스트 프로젝트
 엘리스 LXP(Learning eXperience Platform)를 대상으로
 **기능 테스트 자동화 + 부하 테스트(Spike Traffic)**를 수행하는 QA 프로젝트입니다.
 본 프로젝트는 실제 서비스 품질 검증 프로세스를 경험하며,
@@ -6,18 +6,18 @@ API 분석 → 테스트 케이스 설계 → 자동화 → 부하 테스트까�
 QA 실무 전 과정을 직접 수행하는 것을 목표로 합니다.
 
 
-## 📘 1. 프로젝트 소개
-### 🎯 목적
+## 1. 프로젝트 소개
+### 목적
 - LXP 플랫폼의 일반 학습자(Learner) 관점에서 핵심 기능 검증
 - API 기반 기능 테스트 자동화 구현
 - 대규모 트래픽 상황에서의 성능 한계 및 병목 구간 분석
-### 📌 주요 구성
+### 주요 구성
 - Part 1: 기능 테스트 자동화 (pytest 기반)
 - Part 2: 부하 테스트 (JMeter 기반)
 
 
 
-## 🪜 2. 프로젝트 주요 단계
+## 2. 프로젝트 주요 단계
 **1) 요구사항 분석 & API 명세 검토**
 - 제공된 HTML API 스펙 분석
 - 학습자(Learner) 권한에서 접근 가능한 API만 선별
@@ -63,25 +63,25 @@ LXP 플랫폼의 5개 핵심 메뉴 중심으로 테스트 범위 확정:
 - API 병목 지점 도출
 - 개선 방향 제안
 
-## ✅ 성공 기준
+## 성공 기준
 - Error Rate < 1%
 - 평균 Latency 허용 범위 내 유지
 - 1,000명 사이클 정상 반복
 - TPS·Latency 변화 분석 및 병목 지점 도출
 
-## 🧩 3. 기술 스펙
-### 🔧 Backend API 테스트 환경
+## 3. 기술 스펙
+### Backend API 테스트 환경
 - Python 3.13
 - pytest
 - requests
 - PyYAML
 - python-dotenv
-### ⚙️ 부하 테스트 환경
+### 부하 테스트 환경
 - Apache JMeter 5.x
 - HTTP Request Sampler
 - Loop Controller
 - Summary Report / Aggregate Report
-### 🛠️ 개발 환경
+### 개발 환경
 - GitLab
 - VS Code
 - Git Flow 일부 적용
@@ -89,7 +89,7 @@ LXP 플랫폼의 5개 핵심 메뉴 중심으로 테스트 범위 확정:
 - JMeter
 
 
-## ⚙️ 4. 설치 방법
+## 4. 설치 방법
 1) 저장소 클론
 ```
 git clone https://kdt-gitlab.elice.io/qa_track/class_03/qa3_final_project/team_03/madmax.git
@@ -110,8 +110,8 @@ BASE_URL=https://api.example.com
 ACCESS_TOKEN=your_token_here
 ```
 
-## 👥 팀원 소개
+## 팀원 소개
 박지우 (팀장), 조대건, 신윤아, 심다영, 김건후
 
-## 📅 프로젝트 기간
+## 프로젝트 기간
 2026년 2월 2일(월) ~ 2026년 2월 23일(월)
